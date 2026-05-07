@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id        String    @id @default(uuid()) @db.Uuid
+  code      String    @unique @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @db.Timestamptz()
+  deletedAt DateTime? @db.Timestamptz()
+
+  activityData      ActivityData[]
+  productionBatches ProductionBatch[]
+
+  @@map("products")
+}
+
+model EmissionFactor {
+  id           String    @id @default(uuid()) @db.Uuid
+  activityType String    @db.VarChar(50)
+  scope        String    @db.VarChar(20)
+  sourceName   String    @db.VarChar(100)
+  region       String?   @db.VarChar(50)
+  unit         String    @db.VarChar(20)
+  factor       Decimal   @db.Decimal(10, 6)
+  methodology  String?   @db.VarChar(100)
+  validFrom    DateTime  @db.Date
+  validTo      DateTime? @db.Date
+  createdAt    DateTime  @default(now()) @db.Timestamptz()
+  updatedAt    DateTime  @updatedAt @db.Timestamptz()
+  deletedAt    DateTime? @db.Timestamptz()
+
+  activityData ActivityData[]
+  emissions    Emission[]
+
+  @@map("emission_factors")
+}
+
+model ProductionBatch {
+  id               String    @id @default(uuid()) @db.Uuid
+  productId        String    @db.Uuid
+  producedQuantity Decimal   @db.Decimal(12, 2)
+  periodStart      DateTime  @db.Date
+  periodEnd        DateTime  @db.Date
+  createdAt        DateTime  @default(now()) @db.Timestamptz()
+  updatedAt        DateTime  @updatedAt @db.Timestamptz()
+  deletedAt        DateTime? @db.Timestamptz()
+
+  product      Product        @relation(fields: [productId], references: [id])
+  activityData ActivityData[]
+
+  @@map("production_batches")
+}
+
+model ActivityData {
+  id               String    @id @default(uuid()) @db.Uuid
+  productId        String    @db.Uuid
+  emissionFactorId String    @db.Uuid
+  batchId          String?   @db.Uuid
+  activityType     String    @db.VarChar(50)
+  amount           Decimal   @db.Decimal(12, 4)
+  unit             String    @db.VarChar(20)
+  date             DateTime  @db.Date
+  rawDataJson      Json?     @db.JsonB
+  createdAt        DateTime  @default(now()) @db.Timestamptz()
+  updatedAt        DateTime  @updatedAt @db.Timestamptz()
+  deletedAt        DateTime? @db.Timestamptz()
+
+  product        Product         @relation(fields: [productId], references: [id])
+  emissionFactor EmissionFactor  @relation(fields: [emissionFactorId], references: [id])
+  batch          ProductionBatch? @relation(fields: [batchId], references: [id])
+  emission       Emission?
+
+  @@map("activity_data")
+}
+
+// 1:1 with ActivityData — pre-computed on import
+model Emission {
+  id               String    @id @default(uuid()) @db.Uuid
+  activityDataId   String    @unique @db.Uuid
+  emissionFactorId String    @db.Uuid
+  co2e             Decimal   @db.Decimal(12, 4)
+  createdAt        DateTime  @default(now()) @db.Timestamptz()
+  updatedAt        DateTime  @updatedAt @db.Timestamptz()
+  deletedAt        DateTime? @db.Timestamptz()
+
+  activityData   ActivityData   @relation(fields: [activityDataId], references: [id])
+  emissionFactor EmissionFactor @relation(fields: [emissionFactorId], references: [id])
+
+  @@map("emissions")
+}
