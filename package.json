@@ -1,7 +1,7 @@
 {
   "name": "pcf-dashboard",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,6 +12,10 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio"
   },
+  "engines": {
+    "node": "22.x"
+  },
+  "packageManager": "yarn@1.22.22",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
