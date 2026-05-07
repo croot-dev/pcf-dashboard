@@ -1,0 +1,1347 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dineug/erd-editor/main/json-schema/schema.json",
+  "version": "3.0.0",
+  "settings": {
+    "width": 2000,
+    "height": 2000,
+    "scrollTop": -165.6634,
+    "scrollLeft": -240.3073,
+    "zoomLevel": 0.79,
+    "show": 423,
+    "database": 16,
+    "databaseName": "",
+    "canvasType": "ERD",
+    "language": 1,
+    "tableNameCase": 4,
+    "columnNameCase": 2,
+    "bracketType": 1,
+    "relationshipDataTypeSync": true,
+    "relationshipOptimization": false,
+    "columnOrder": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "maxWidthComment": -1,
+    "ignoreSaveSettings": 0
+  },
+  "doc": {
+    "tableIds": [
+      "t1",
+      "t2",
+      "t3",
+      "t4",
+      "t5"
+    ],
+    "relationshipIds": [
+      "r1",
+      "r2",
+      "r3",
+      "r4",
+      "r5",
+      "r6"
+    ],
+    "indexIds": [],
+    "memoIds": []
+  },
+  "collections": {
+    "tableEntities": {
+      "t1": {
+        "id": "t1",
+        "name": "products",
+        "comment": "제품 목록",
+        "columnIds": [
+          "c1_1",
+          "c1_2",
+          "c1_3",
+          "c1_4",
+          "c1_5",
+          "c1_6"
+        ],
+        "seqColumnIds": [
+          "c1_1",
+          "c1_2",
+          "c1_3",
+          "c1_4",
+          "c1_5",
+          "c1_6"
+        ],
+        "ui": {
+          "x": 46,
+          "y": 188,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1778133861668,
+          "createAt": 1778133222497
+        }
+      },
+      "t2": {
+        "id": "t2",
+        "name": "emission_factors",
+        "comment": "배출계수 + 버전 이력",
+        "columnIds": [
+          "c2_1",
+          "c2_2",
+          "c2_3",
+          "c2_4",
+          "c2_5",
+          "c2_6",
+          "c2_7",
+          "c2_8",
+          "c2_9",
+          "c2_10",
+          "c2_11",
+          "c2_12",
+          "c2_13"
+        ],
+        "seqColumnIds": [
+          "c2_1",
+          "c2_2",
+          "c2_3",
+          "c2_4",
+          "c2_5",
+          "c2_6",
+          "c2_7",
+          "c2_8",
+          "c2_9",
+          "c2_10",
+          "c2_11",
+          "c2_12",
+          "c2_13"
+        ],
+        "ui": {
+          "x": 1065.7515,
+          "y": 128.3977,
+          "zIndex": 1,
+          "widthName": 98,
+          "widthComment": 103,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1778136491375,
+          "createAt": 1778133222497
+        }
+      },
+      "t3": {
+        "id": "t3",
+        "name": "activity_data",
+        "comment": "원본 활동 데이터 (엑셀 업로드)",
+        "columnIds": [
+          "c3_1",
+          "c3_2",
+          "c3_3",
+          "c3_4",
+          "c3_5",
+          "c3_6",
+          "c3_7",
+          "c3_8",
+          "c3_10b",
+          "c3_9",
+          "c3_10",
+          "c3_11"
+        ],
+        "seqColumnIds": [
+          "c3_1",
+          "c3_2",
+          "c3_3",
+          "c3_4",
+          "c3_5",
+          "c3_6",
+          "c3_7",
+          "c3_8",
+          "c3_10b",
+          "c3_9",
+          "c3_10",
+          "c3_11"
+        ],
+        "ui": {
+          "x": 481.0526,
+          "y": 139.4737,
+          "zIndex": 1,
+          "widthName": 74,
+          "widthComment": 149,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1778133877667,
+          "createAt": 1778133222497
+        }
+      },
+      "t4": {
+        "id": "t4",
+        "name": "emissions",
+        "comment": "계산된 배출량",
+        "columnIds": [
+          "c4_1",
+          "c4_2",
+          "c4_3",
+          "c4_4",
+          "c4_5",
+          "c4_6",
+          "c4_7"
+        ],
+        "seqColumnIds": [
+          "c4_1",
+          "c4_2",
+          "c4_3",
+          "c4_4",
+          "c4_5",
+          "c4_6",
+          "c4_7"
+        ],
+        "ui": {
+          "x": 753.4177,
+          "y": 600.3797,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 68,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1778136496475,
+          "createAt": 1778133222497
+        }
+      },
+      "t5": {
+        "id": "t5",
+        "name": "production_batches",
+        "comment": "생산량 기록",
+        "columnIds": [
+          "c5_1",
+          "c5_2",
+          "c5_3",
+          "c5_4",
+          "c5_5",
+          "c5_6",
+          "c5_7",
+          "c5_8"
+        ],
+        "seqColumnIds": [
+          "c5_1",
+          "c5_2",
+          "c5_3",
+          "c5_4",
+          "c5_5",
+          "c5_6",
+          "c5_7",
+          "c5_8"
+        ],
+        "ui": {
+          "x": 80,
+          "y": 528,
+          "zIndex": 1,
+          "widthName": 116,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1778133494642,
+          "createAt": 1778133222497
+        }
+      }
+    },
+    "tableColumnEntities": {
+      "c1_1": {
+        "id": "c1_1",
+        "tableId": "t1",
+        "name": "id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c1_2": {
+        "id": "c1_2",
+        "tableId": "t1",
+        "name": "code",
+        "comment": "예) CT-045",
+        "dataType": "VARCHAR(20)",
+        "default": "",
+        "options": 12,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 64,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c1_3": {
+        "id": "c1_3",
+        "tableId": "t1",
+        "name": "name",
+        "comment": "",
+        "dataType": "VARCHAR(100)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 89,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c1_4": {
+        "id": "c1_4",
+        "tableId": "t1",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_1": {
+        "id": "c2_1",
+        "tableId": "t2",
+        "name": "id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_2": {
+        "id": "c2_2",
+        "tableId": "t2",
+        "name": "activity_type",
+        "comment": "전기·원소재·운송",
+        "dataType": "VARCHAR(50)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 74,
+          "widthComment": 82,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_3": {
+        "id": "c2_3",
+        "tableId": "t2",
+        "name": "scope",
+        "comment": "Scope 1/2/3",
+        "dataType": "VARCHAR(20)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 69,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_4": {
+        "id": "c2_4",
+        "tableId": "t2",
+        "name": "source_name",
+        "comment": "한국전력·플라스틱 등",
+        "dataType": "VARCHAR(100)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 78,
+          "widthComment": 102,
+          "widthDataType": 89,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_5": {
+        "id": "c2_5",
+        "tableId": "t2",
+        "name": "region",
+        "comment": "",
+        "dataType": "VARCHAR(50)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_6": {
+        "id": "c2_6",
+        "tableId": "t2",
+        "name": "unit",
+        "comment": "kWh·kg·ton-km",
+        "dataType": "VARCHAR(20)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 89,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_7": {
+        "id": "c2_7",
+        "tableId": "t2",
+        "name": "factor",
+        "comment": "kgCO₂e per unit",
+        "dataType": "DECIMAL(10,6)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 91,
+          "widthDataType": 88,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_8": {
+        "id": "c2_8",
+        "tableId": "t2",
+        "name": "methodology",
+        "comment": "",
+        "dataType": "VARCHAR(100)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 76,
+          "widthComment": 60,
+          "widthDataType": 89,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_9": {
+        "id": "c2_9",
+        "tableId": "t2",
+        "name": "valid_from",
+        "comment": "",
+        "dataType": "DATE",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_10": {
+        "id": "c2_10",
+        "tableId": "t2",
+        "name": "valid_to",
+        "comment": "NULL=현재 유효",
+        "dataType": "DATE",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 86,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_11": {
+        "id": "c2_11",
+        "tableId": "t2",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_1": {
+        "id": "c3_1",
+        "tableId": "t3",
+        "name": "id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_2": {
+        "id": "c3_2",
+        "tableId": "t3",
+        "name": "product_id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 64,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_3": {
+        "id": "c3_3",
+        "tableId": "t3",
+        "name": "emission_factor_id",
+        "comment": "import 시점 버전 고정",
+        "dataType": "UUID",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 109,
+          "widthComment": 111,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_4": {
+        "id": "c3_4",
+        "tableId": "t3",
+        "name": "activity_type",
+        "comment": "",
+        "dataType": "VARCHAR(50)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 74,
+          "widthComment": 60,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_5": {
+        "id": "c3_5",
+        "tableId": "t3",
+        "name": "amount",
+        "comment": "",
+        "dataType": "DECIMAL(12,4)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 88,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_6": {
+        "id": "c3_6",
+        "tableId": "t3",
+        "name": "unit",
+        "comment": "",
+        "dataType": "VARCHAR(20)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 83,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_7": {
+        "id": "c3_7",
+        "tableId": "t3",
+        "name": "date",
+        "comment": "",
+        "dataType": "DATE",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_8": {
+        "id": "c3_8",
+        "tableId": "t3",
+        "name": "raw_data_json",
+        "comment": "엑셀 원본 행 데이터",
+        "dataType": "JSONB",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 84,
+          "widthComment": 95,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_9": {
+        "id": "c3_9",
+        "tableId": "t3",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_1": {
+        "id": "c4_1",
+        "tableId": "t4",
+        "name": "id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_2": {
+        "id": "c4_2",
+        "tableId": "t4",
+        "name": "activity_data_id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 91,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_3": {
+        "id": "c4_3",
+        "tableId": "t4",
+        "name": "emission_factor_id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 109,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_4": {
+        "id": "c4_4",
+        "tableId": "t4",
+        "name": "co2e",
+        "comment": "amount × factor (kgCO₂e)",
+        "dataType": "DECIMAL(12,4)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 147,
+          "widthDataType": 88,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_5": {
+        "id": "c4_5",
+        "tableId": "t4",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_1": {
+        "id": "c5_1",
+        "tableId": "t5",
+        "name": "id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 10,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_2": {
+        "id": "c5_2",
+        "tableId": "t5",
+        "name": "product_id",
+        "comment": "",
+        "dataType": "UUID",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 64,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_3": {
+        "id": "c5_3",
+        "tableId": "t5",
+        "name": "produced_quantity",
+        "comment": "생산 단위 수",
+        "dataType": "DECIMAL(12,2)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 109,
+          "widthComment": 61,
+          "widthDataType": 87,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_4": {
+        "id": "c5_4",
+        "tableId": "t5",
+        "name": "period_start",
+        "comment": "",
+        "dataType": "DATE",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 71,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_5": {
+        "id": "c5_5",
+        "tableId": "t5",
+        "name": "period_end",
+        "comment": "",
+        "dataType": "DATE",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 66,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_6": {
+        "id": "c5_6",
+        "tableId": "t5",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c1_5": {
+        "id": "c1_5",
+        "tableId": "t1",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c1_6": {
+        "id": "c1_6",
+        "tableId": "t1",
+        "name": "deleted_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778134794179,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_12": {
+        "id": "c2_12",
+        "tableId": "t2",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c2_13": {
+        "id": "c2_13",
+        "tableId": "t2",
+        "name": "deleted_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778134788265,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_10": {
+        "id": "c3_10",
+        "tableId": "t3",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_11": {
+        "id": "c3_11",
+        "tableId": "t3",
+        "name": "deleted_at",
+        "comment": "소프트 삭제",
+        "dataType": "TIMESTAMPTZ",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_6": {
+        "id": "c4_6",
+        "tableId": "t4",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c4_7": {
+        "id": "c4_7",
+        "tableId": "t4",
+        "name": "deleted_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778134790159,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_7": {
+        "id": "c5_7",
+        "tableId": "t5",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "NOW()",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "c5_8": {
+        "id": "c5_8",
+        "tableId": "t5",
+        "name": "deleted_at",
+        "comment": "",
+        "dataType": "TIMESTAMPTZ",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 86,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778134792432,
+          "createAt": 1778133222497
+        }
+      },
+      "c3_10b": {
+        "id": "c3_10b",
+        "tableId": "t3",
+        "name": "batch_id",
+        "comment": "생산 배치 연결 (기간별 PCF 집계)",
+        "dataType": "UUID",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 165,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      }
+    },
+    "relationshipEntities": {
+      "r1": {
+        "id": "r1",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "t1",
+          "columnIds": [
+            "c1_1"
+          ],
+          "x": 383,
+          "y": 288,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "t3",
+          "columnIds": [
+            "c3_2"
+          ],
+          "x": 481.0526,
+          "y": 225.4737,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "r2": {
+        "id": "r2",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "t2",
+          "columnIds": [
+            "c2_1"
+          ],
+          "x": 1065.7515,
+          "y": 312.3977,
+          "direction": 1
+        },
+        "end": {
+          "tableId": "t3",
+          "columnIds": [
+            "c3_3"
+          ],
+          "x": 960.0526,
+          "y": 311.4737,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "r3": {
+        "id": "r3",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "t3",
+          "columnIds": [
+            "c3_1"
+          ],
+          "x": 720.5526,
+          "y": 483.4737,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "t4",
+          "columnIds": [
+            "c4_2"
+          ],
+          "x": 753.4177,
+          "y": 712.3797,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "r4": {
+        "id": "r4",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "t2",
+          "columnIds": [
+            "c2_1"
+          ],
+          "x": 1258.7515,
+          "y": 496.3977,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "t4",
+          "columnIds": [
+            "c4_3"
+          ],
+          "x": 1214.4177,
+          "y": 712.3797,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "r5": {
+        "id": "r5",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "t1",
+          "columnIds": [
+            "c1_1"
+          ],
+          "x": 214.5,
+          "y": 388,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "t5",
+          "columnIds": [
+            "c5_2"
+          ],
+          "x": 173.5,
+          "y": 528,
+          "direction": 4
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      },
+      "r6": {
+        "id": "r6",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "t5",
+          "columnIds": [
+            "c5_1"
+          ],
+          "x": 360.5,
+          "y": 528,
+          "direction": 4
+        },
+        "end": {
+          "tableId": "t3",
+          "columnIds": [
+            "c3_10b"
+          ],
+          "x": 481.0526,
+          "y": 397.4737,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1778133222497,
+          "createAt": 1778133222497
+        }
+      }
+    },
+    "indexEntities": {},
+    "indexColumnEntities": {},
+    "memoEntities": {}
+  }
+}
