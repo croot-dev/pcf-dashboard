@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Database, LayoutDashboard, Leaf } from "lucide-react"
+import { Database, LayoutDashboard } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -18,7 +18,7 @@ import {
 
 const NAV_ITEMS = [
   { href: "/",         icon: LayoutDashboard, label: "경영자 대시보드" },
-  { href: "/data",     icon: Database,        label: "실무자 대시보드" }
+  { href: "/operator", icon: Database,        label: "실무자 대시보드" }
 ]
 
 export function AppSidebar() {

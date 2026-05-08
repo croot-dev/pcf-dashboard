@@ -5,14 +5,17 @@ import type {
   DashboardData,
   FactorRow,
   MonthlyPoint,
-  PeriodId,
+  PCFTableRow,
   RecordCounts,
   SourceRow,
+  YoYPoint,
 } from "@/lib/mock-data"
 
 export type DashboardEmissionRow = {
   date: Date
   co2e: number
+  amount: number
+  activityUnit: string
   activityType: string
   sourceName: string
   scope: 1 | 2 | 3
@@ -22,16 +25,6 @@ export type DashboardEmissionRow = {
   batchId?: string | null
   producedQuantity?: number | null
 }
-
-export type ActiveEmissionFactorRow = {
-  activityType: string
-  sourceName: string
-  scope: 1 | 2 | 3
-  unit: string
-  factor: number
-}
-
-type ActivityEmissionKey = Exclude<keyof ActivityPoint, "m">
 
 export type PeriodWindow = {
   currentStart: Date
@@ -48,81 +41,28 @@ const EMPTY_COUNTS: RecordCounts = {
   transport: 0,
 }
 
-const QUARTER_START_MONTH: Record<"q1" | "q2" | "q3" | "q4", number> = {
-  q1: 0,
-  q2: 3,
-  q3: 6,
-  q4: 9,
-}
-
-const QUARTER_PREV: Record<
-  "q1" | "q2" | "q3" | "q4",
-  { q: "q1" | "q2" | "q3" | "q4"; yearOffset: number }
-> = {
-  q1: { q: "q4", yearOffset: -1 },
-  q2: { q: "q1", yearOffset: 0 },
-  q3: { q: "q2", yearOffset: 0 },
-  q4: { q: "q3", yearOffset: 0 },
-}
-
-/**
- * 선택된 기간(q1~q4, year)의 현재/이전 기간 범위를 계산
- */
-export function getPeriodWindow(period: PeriodId, anchor: Date): PeriodWindow {
-  const base = dayjs.utc(anchor)
-
-  if (period !== "year") {
-    const year = base.year()
-    const startMonth = QUARTER_START_MONTH[period]
-
-    const currentStart = dayjs.utc()
-      .year(year)
-      .month(startMonth)
-      .startOf("month")
-
-    const currentEnd = currentStart.endOf("quarter")
-
-    const prev = QUARTER_PREV[period]
-    const prevStart = dayjs.utc()
-      .year(year + prev.yearOffset)
-      .month(QUARTER_START_MONTH[prev.q])
-      .startOf("month")
-
-    const previousEnd = prevStart.endOf("quarter")
-
-    return {
-      currentStart: currentStart.toDate(),
-      currentEnd: currentEnd.toDate(),
-      previousStart: prevStart.toDate(),
-      previousEnd: previousEnd.toDate(),
-      trendStart: currentStart.toDate(),
-      trendEnd: currentEnd.toDate(),
-    }
-  }
-
-  const currentStart = base.startOf("year")
-  const yearEnd = base.endOf("year")
+export function getPeriodWindow(year: number): PeriodWindow {
+  const cur = dayjs.utc(`${year}-01-01`).startOf("year")
+  const curEnd = cur.endOf("year")
+  const prev = cur.subtract(1, "year")
+  const prevEnd = prev.endOf("year")
 
   return {
-    currentStart: currentStart.toDate(),
-    currentEnd: (base.isBefore(yearEnd) ? base : yearEnd).toDate(),
-    previousStart: base.subtract(1, "year").startOf("year").toDate(),
-    previousEnd: base.subtract(1, "year").toDate(),
-    trendStart: currentStart.toDate(),
-    trendEnd: (base.isBefore(yearEnd) ? base : yearEnd).toDate(),
+    currentStart: cur.toDate(),
+    currentEnd: curEnd.toDate(),
+    previousStart: prev.toDate(),
+    previousEnd: prevEnd.toDate(),
+    trendStart: cur.toDate(),
+    trendEnd: curEnd.toDate(),
   }
 }
 
-/**
- * 유효한 기간 검사
- */
-export function isValidPeriod(period: string | null): period is PeriodId {
-  return ["q1", "q2", "q3", "q4", "year"].includes(period ?? "")
+export function isValidPeriod(period: string | null): boolean {
+  if (!period) return false
+  const n = Number(period)
+  return Number.isInteger(n) && n >= 2000 && n <= 2099
 }
 
-/**
- * 기간 창을 기반으로 포함되는 날짜 필터를 생성
- */
 export function toInclusiveDateFilter(
   window: Pick<PeriodWindow, "currentStart" | "currentEnd">
 ) {
@@ -134,29 +74,18 @@ export function toInclusiveDateFilter(
 
 export function toScope(value: string | number): 1 | 2 | 3 {
   const normalized = String(value).replace(/scope/i, "").trim()
-
-  if (["1", "2", "3"].includes(normalized)) {
-    return Number(normalized) as 1 | 2 | 3
-  }
-
+  if (["1", "2", "3"].includes(normalized)) return Number(normalized) as 1 | 2 | 3
   return 3
 }
 
-/**
- * 배열의 총합 계산
- */
 function sum(rows: DashboardEmissionRow[]) {
   return rows.reduce((total, row) => total + row.co2e, 0)
 }
 
-/**
- * 백분율 변화 계산
- */
 function percentDelta(current: number, previous: number) {
-  if (previous === 0) return 100
+  if (previous === 0) return 0
   return ((current - previous) / previous) * 100
 }
-
 
 function monthKey(date: Date) {
   return dayjs.utc(date).format("YYYY-MM")
@@ -166,76 +95,30 @@ function monthLabel(date: Date) {
   return dayjs.utc(date).format("MM")
 }
 
-/**
- * 활동 유형에 따라 버킷을 결정
- */
-function getActivityBucket(row: DashboardEmissionRow): ActivityEmissionKey {
-  const activityType = row.activityType.toLowerCase()
-  const sourceName = row.sourceName.toLowerCase()
-
-  if (activityType.includes("전기") || activityType.includes("electric")) {
-    return "electricity"
-  }
-
-  if (activityType.includes("운송") || activityType.includes("transport")) {
-    return "truck"
-  }
-
-  if (
-    sourceName.includes("2") ||
-    sourceName.includes("철강") ||
-    sourceName.includes("steel")
-  ) {
-    return "plastic2"
-  }
-
-  return "plastic1"
-}
-
-/**
- * 활동 유형에 따라 카운트 버킷을 결정
- */
 function countBucket(row: DashboardEmissionRow): keyof RecordCounts {
-  const activityType = row.activityType.toLowerCase()
-
-  if (activityType.includes("전기") || activityType.includes("electric")) {
-    return "electricity"
-  }
-
-  if (activityType.includes("운송") || activityType.includes("transport")) {
-    return "transport"
-  }
-
+  const t = row.activityType.toLowerCase()
+  if (t.includes("전기") || t.includes("electric")) return "electricity"
+  if (t.includes("운송") || t.includes("transport")) return "transport"
   return "rawMaterial"
 }
 
-/**
- * 월별 추세 데이터 파싱
- */
 export function buildMonthlyTrend(
   rows: DashboardEmissionRow[],
   window: PeriodWindow
 ): MonthlyPoint[] {
   const totals = new Map<string, number>()
-
   for (const row of rows) {
     const key = monthKey(row.date)
     totals.set(key, (totals.get(key) ?? 0) + row.co2e)
   }
 
   const points: MonthlyPoint[] = []
-
   let cursor = dayjs.utc(window.trendStart).startOf("month")
   const end = dayjs.utc(window.trendEnd).startOf("month")
 
   while (cursor.isBefore(end) || cursor.isSame(end)) {
     const key = cursor.format("YYYY-MM")
-
-    points.push({
-      m: key,
-      co2: totals.get(key) ?? 0,
-    })
-
+    points.push({ m: key, co2: totals.get(key) ?? 0 })
     cursor = cursor.add(1, "month")
   }
 
@@ -246,35 +129,24 @@ export function buildActivityTrend(
   rows: DashboardEmissionRow[],
   window: PeriodWindow
 ): ActivityPoint[] {
-  const totals = new Map<string, ActivityPoint>()
+  const points = new Map<string, ActivityPoint>()
 
   let cursor = dayjs.utc(window.trendStart).startOf("month")
   const end = dayjs.utc(window.trendEnd).startOf("month")
 
   while (cursor.isBefore(end) || cursor.isSame(end)) {
-    const label = cursor.format("MM")
-
-    totals.set(label, {
-      m: label,
-      electricity: 0,
-      plastic1: 0,
-      plastic2: 0,
-      truck: 0,
-    })
-
+    points.set(cursor.format("MM"), { m: cursor.format("MM") })
     cursor = cursor.add(1, "month")
   }
 
   for (const row of rows) {
     const label = monthLabel(row.date)
-    const point = totals.get(label)
-
+    const point = points.get(label)
     if (!point) continue
-
-    point[getActivityBucket(row)] += row.co2e
+    point[row.activityType] = ((point[row.activityType] as number | undefined) ?? 0) + row.co2e
   }
 
-  return Array.from(totals.values())
+  return Array.from(points.values())
 }
 
 export function buildSources(rows: DashboardEmissionRow[]): SourceRow[] {
@@ -282,69 +154,124 @@ export function buildSources(rows: DashboardEmissionRow[]): SourceRow[] {
 
   for (const row of rows) {
     const name = `${row.activityType} · ${row.sourceName}`
-
     const existing = totals.get(name)
-
     if (existing) {
       existing.value += row.co2e
     } else {
-      totals.set(name, {
-        name,
-        value: row.co2e,
-        scope: row.scope,
-      })
+      totals.set(name, { name, value: row.co2e, scope: row.scope })
     }
   }
 
   return Array.from(totals.values()).sort((a, b) => b.value - a.value)
 }
 
-export function buildRecordCounts(
-  rows: DashboardEmissionRow[]
-): RecordCounts {
-  const counts = { ...EMPTY_COUNTS }
+type PCFAggEntry = {
+  activityType: string
+  sourceName: string
+  scope: 1 | 2 | 3
+  amount: number
+  unit: string
+  co2e: number
+}
 
+export function buildPCFTable(
+  rows: DashboardEmissionRow[],
+  totalQuantity: number,
+  factors: FactorRow[]
+): PCFTableRow[] {
+  // 활동유형·배출원 조합으로 집계: 같은 배출원의 월별 데이터를 합산
+  const agg = new Map<string, PCFAggEntry>()
+
+  for (const row of rows) {
+    const key = `${row.activityType}|${row.sourceName}`
+    const existing = agg.get(key)
+    if (existing) {
+      existing.amount += row.amount
+      existing.co2e += row.co2e
+    } else {
+      agg.set(key, {
+        activityType: row.activityType,
+        sourceName: row.sourceName,
+        scope: row.scope,
+        amount: row.amount,
+        unit: row.activityUnit,
+        co2e: row.co2e,
+      })
+    }
+  }
+
+  const factorMap = new Map(factors.map((f) => [`${f.activityType}|${f.sourceName}`, f]))
+
+  return Array.from(agg.values())
+    .map((entry) => {
+      const f = factorMap.get(`${entry.activityType}|${entry.sourceName}`)
+      return {
+        activityType: entry.activityType,
+        sourceName: entry.sourceName,
+        scope: entry.scope,
+        amount: entry.amount,
+        unit: entry.unit,
+        factor: f?.factor ?? 0,
+        factorUnit: f?.unit ?? "",
+        co2e: entry.co2e,
+        // 배출원별 CO₂e를 동일한 생산 수량으로 나눔: PCF = 배출원 CO₂e 합계 / 총생산량
+        // 이미 모든 배출원이 같은 제품 배치에서 발생
+        co2ePerUnit: totalQuantity > 0 ? entry.co2e / totalQuantity : 0,
+      }
+    })
+    .sort((a, b) => a.scope - b.scope || b.co2e - a.co2e)
+}
+
+export function buildRecordCounts(rows: DashboardEmissionRow[]): RecordCounts {
+  const counts = { ...EMPTY_COUNTS }
   for (const row of rows) {
     counts[countBucket(row)] += 1
   }
-
   return counts
 }
 
 export function buildScope(rows: DashboardEmissionRow[]) {
-  return rows.reduce(
-    (scope, row) => {
-      if (row.scope === 1) scope.s1 += row.co2e
-      if (row.scope === 2) scope.s2 += row.co2e
-      if (row.scope === 3) scope.s3 += row.co2e
+  const scope = { s1: 0, s2: 0, s3: 0 }
+  for (const row of rows) {
+    if (row.scope === 1) scope.s1 += row.co2e
+    else if (row.scope === 2) scope.s2 += row.co2e
+    else scope.s3 += row.co2e
+  }
+  return scope
+}
 
-      return scope
-    },
-    { s1: 0, s2: 0, s3: 0 }
-  )
+export function buildYoYActivity(
+  currentRows: DashboardEmissionRow[],
+  previousRows: DashboardEmissionRow[]
+): YoYPoint[] {
+  const thisYear = new Map<string, number>()
+  const lastYear = new Map<string, number>()
+
+  for (const row of currentRows) {
+    const m = dayjs.utc(row.date).format("MM")
+    thisYear.set(m, (thisYear.get(m) ?? 0) + row.co2e)
+  }
+
+  for (const row of previousRows) {
+    const m = dayjs.utc(row.date).format("MM")
+    lastYear.set(m, (lastYear.get(m) ?? 0) + row.co2e)
+  }
+
+  return Array.from({ length: 12 }, (_, i) => {
+    const m = String(i + 1).padStart(2, "0")
+    return { m, thisYear: thisYear.get(m) ?? 0, lastYear: lastYear.get(m) ?? 0 }
+  })
 }
 
 export function buildProducts(
   currentRows: DashboardEmissionRow[],
   previousRows: DashboardEmissionRow[]
 ) {
-  const current = new Map<
-    string,
-    {
-      code: string
-      name: string
-      co2e: number
-      quantity: number
-      batchIds: Set<string>
-    }
-  >()
-
+  const current = new Map<string, { code: string; name: string; co2e: number; quantity: number; batchIds: Set<string> }>()
   const previous = new Map<string, number>()
 
   for (const row of currentRows) {
-    const key = row.productCode
-
-    const existing = current.get(key) ?? {
+    const existing = current.get(row.productCode) ?? {
       code: row.productCode,
       name: row.productName,
       co2e: 0,
@@ -359,14 +286,11 @@ export function buildProducts(
       existing.quantity += row.producedQuantity ?? 0
     }
 
-    current.set(key, existing)
+    current.set(row.productCode, existing)
   }
 
   for (const row of previousRows) {
-    previous.set(
-      row.productCode,
-      (previous.get(row.productCode) ?? 0) + row.co2e
-    )
+    previous.set(row.productCode, (previous.get(row.productCode) ?? 0) + row.co2e)
   }
 
   const products = Array.from(current.values()).map((row) => ({
@@ -381,9 +305,6 @@ export function buildProducts(
     : [{ code: "N/A", name: "제품 데이터 없음", unit: 0, delta: 0 }]
 }
 
-/**
- * 경영진 대시보드용 통합 데이터 생성
- */
 export function buildExecutiveDashboardData({
   currentRows,
   previousRows,
@@ -401,26 +322,32 @@ export function buildExecutiveDashboardData({
   const previousTotalCO2 = sum(previousRows)
   const recordCounts = buildRecordCounts(currentRows)
 
+  const seenBatches = new Set<string>()
+  let totalQuantity = 0
+  for (const row of currentRows) {
+    if (row.batchId && !seenBatches.has(row.batchId)) {
+      seenBatches.add(row.batchId)
+      totalQuantity += row.producedQuantity ?? 0
+    }
+  }
+
+  const latestImport = currentRows.reduce<Date | null>(
+    (latest, row) => (latest === null || row.createdAt > latest ? row.createdAt : latest),
+    null
+  )
+
   return {
     totalCO2,
     deltaCO2: percentDelta(totalCO2, previousTotalCO2),
-
-    lastImport:
-      currentRows
-        .map((row) => row.createdAt)
-        .sort((a, b) => b.getTime() - a.getTime())[0]
-        ? dayjs(
-            currentRows
-              .map((row) => row.createdAt)
-              .sort((a, b) => b.getTime() - a.getTime())[0]
-          ).format("YYYY-MM-DD HH:mm")
-        : "-",
-
+    totalPCF: totalQuantity > 0 ? totalCO2 / totalQuantity : 0,
+    totalQuantity,
+    pcfTable: buildPCFTable(currentRows, totalQuantity, factors),
+    lastImport: latestImport ? dayjs(latestImport).format("YYYY-MM-DD HH:mm") : "-",
     recordCount: currentRows.length,
     recordCounts,
-
     monthly: buildMonthlyTrend(trendRows, window),
     activity: buildActivityTrend(trendRows, window),
+    yoyActivity: buildYoYActivity(currentRows, previousRows),
     products: buildProducts(currentRows, previousRows),
     sources: buildSources(currentRows),
     scope: buildScope(currentRows),
