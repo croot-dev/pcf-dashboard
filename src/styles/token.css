@@ -1,0 +1,239 @@
+/* ============================================================
+   HanaLoop Design System — Foundations
+   Colors, type, spacing, radii, shadows.
+   ============================================================ */
+
+:root {
+  /* ---- Brand ------------------------------------------------- */
+  --hl-emerald-500: #10b981; /* logo left anchor */
+  --hl-emerald-600: #059669;
+  --hl-sky-500: #1e90ff;     /* logo right anchor */
+  --hl-sky-600: #2563eb;
+  --hl-gradient: linear-gradient(90deg, var(--hl-emerald-500) 0%, var(--hl-sky-500) 100%);
+
+  /* ---- Slate neutrals ---------------------------------------- */
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+
+  /* ---- Semantic palette -------------------------------------- */
+  --success-50:  #ecfdf5;
+  --success-500: var(--hl-emerald-500);
+  --success-700: #047857;
+
+  --info-50:  #eff6ff;
+  --info-500: var(--hl-sky-600);
+  --info-700: #1d4ed8;
+
+  --warning-50:  #fffbeb;
+  --warning-500: #f59e0b;
+  --warning-700: #b45309;
+
+  --danger-50:  #fff1f2;
+  --danger-500: #e11d48;
+  --danger-700: #be123c;
+
+  /* ---- Scope-specific (PCF domain) --------------------------- */
+  --scope-1: #0ea5e9; /* direct — sky */
+  --scope-2: #8b5cf6; /* purchased energy — violet */
+  --scope-3: #10b981; /* value chain — emerald */
+
+  /* ---- Surfaces / fg / bg (LIGHT) ---------------------------- */
+  --bg:           #ffffff;
+  --bg-subtle:    var(--slate-50);
+  --bg-muted:     var(--slate-100);
+  --surface:      #ffffff;
+  --surface-elevated: #ffffff;
+  --border:       var(--slate-200);
+  --border-strong: var(--slate-300);
+
+  --fg-1: var(--slate-900); /* primary text */
+  --fg-2: var(--slate-700); /* secondary text */
+  --fg-3: var(--slate-500); /* tertiary / captions */
+  --fg-4: var(--slate-400); /* placeholders / disabled */
+  --fg-on-accent: #ffffff;
+
+  --link:        var(--info-500);
+  --link-hover:  var(--info-700);
+
+  /* ---- Type scale -------------------------------------------- */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+               "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs:   12px;  --lh-xs:   16px;
+  --text-sm:   13px;  --lh-sm:   18px;
+  --text-base: 14px;  --lh-base: 20px;
+  --text-md:   15px;  --lh-md:   22px;
+  --text-lg:   17px;  --lh-lg:   24px;
+  --text-xl:   20px;  --lh-xl:   28px;
+  --text-2xl:  24px;  --lh-2xl:  32px;
+  --text-3xl:  30px;  --lh-3xl:  36px;
+  --text-4xl:  36px;  --lh-4xl:  40px;
+  --text-5xl:  48px;  --lh-5xl:  52px;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* ---- Spacing (4px grid) ------------------------------------ */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ---- Radii ------------------------------------------------- */
+  --radius-xs:  4px; /* table-cell focus rings */
+  --radius-sm:  6px; /* badges, chips */
+  --radius-md:  8px; /* default — cards, buttons, inputs */
+  --radius-lg:  12px; /* dialogs, popovers */
+  --radius-full: 9999px; /* avatars only */
+
+  /* ---- Shadows ----------------------------------------------- */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08),
+               0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 16px 32px -8px rgba(15, 23, 42, 0.12),
+               0 4px 8px -2px rgba(15, 23, 42, 0.04);
+  --ring-focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--info-500);
+
+  /* ---- Motion ------------------------------------------------ */
+  --motion-fast: 150ms ease-out;
+  --motion-base: 200ms ease-out;
+  --motion-slow: 400ms ease-out;
+
+  /* ---- Layout chrome ----------------------------------------- */
+  --sidebar-w:           240px;
+  --sidebar-w-collapsed: 64px;
+  --header-h:            56px;
+  --content-max:         1440px;
+}
+
+/* --- Dark mode ------------------------------------------------- */
+:root[data-theme="dark"],
+.theme-dark {
+  --bg:        #0b0f14;
+  --bg-subtle: #0f1620;
+  --bg-muted:  #131c27;
+  --surface:   #111922;
+  --surface-elevated: #15202d;
+  --border:        #1f2a37;
+  --border-strong: #2a3a4d;
+
+  --fg-1: #f1f5f9;
+  --fg-2: #cbd5e1;
+  --fg-3: #94a3b8;
+  --fg-4: #64748b;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5),
+               0 2px 4px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Semantic element styles ----------------------------------- */
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--lh-base);
+  color: var(--fg-1);
+  background: var(--bg);
+  font-feature-settings: "ss01", "tnum"; /* tabular figures */
+  -webkit-font-smoothing: antialiased;
+}
+
+.h1 { font-size: var(--text-4xl); line-height: var(--lh-4xl); font-weight: var(--fw-semibold); letter-spacing: -0.02em; }
+.h2 { font-size: var(--text-3xl); line-height: var(--lh-3xl); font-weight: var(--fw-semibold); letter-spacing: -0.015em; }
+.h3 { font-size: var(--text-2xl); line-height: var(--lh-2xl); font-weight: var(--fw-semibold); letter-spacing: -0.01em; }
+.h4 { font-size: var(--text-xl);  line-height: var(--lh-xl);  font-weight: var(--fw-semibold); }
+.h5 { font-size: var(--text-lg);  line-height: var(--lh-lg);  font-weight: var(--fw-semibold); }
+
+.body-lg { font-size: var(--text-md);  line-height: var(--lh-md); }
+.body    { font-size: var(--text-base); line-height: var(--lh-base); }
+.body-sm { font-size: var(--text-sm);  line-height: var(--lh-sm); color: var(--fg-2); }
+.caption { font-size: var(--text-xs);  line-height: var(--lh-xs); color: var(--fg-3); letter-spacing: 0.01em; }
+
+.label    { font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: var(--fw-medium); color: var(--fg-2); }
+.eyebrow  { font-size: 11px; line-height: 14px; font-weight: var(--fw-semibold);
+            letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
+
+.mono    { font-family: var(--font-mono); font-feature-settings: "tnum"; }
+.numeric { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; text-underline-offset: 2px; }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+}
+
+hr { border: 0; border-top: 1px solid var(--border); margin: var(--space-6) 0; }
+
+/* --- Utility primitives --------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+.card-compact { padding: var(--space-4); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  height: 36px; padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font: var(--fw-medium) var(--text-base)/1 var(--font-sans);
+  border: 1px solid transparent;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+  cursor: pointer; user-select: none;
+}
+.btn-primary   { background: var(--info-500); color: var(--fg-on-accent); }
+.btn-primary:hover  { background: var(--info-700); }
+.btn-secondary { background: var(--surface); color: var(--fg-1); border-color: var(--border); }
+.btn-secondary:hover { background: var(--bg-muted); }
+.btn-ghost    { background: transparent; color: var(--fg-1); }
+.btn-ghost:hover { background: var(--bg-muted); }
+.btn-danger   { background: var(--danger-500); color: var(--fg-on-accent); }
+.btn-danger:hover  { background: var(--danger-700); }
+
+.input {
+  height: 36px; padding: 0 var(--space-3);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--fg-1);
+  font: var(--text-base)/1 var(--font-sans);
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+}
+.input:focus { outline: none; border-color: var(--info-500); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font: var(--fw-medium) var(--text-xs)/1 var(--font-sans);
+  background: var(--bg-muted); color: var(--fg-2);
+}
+.badge-success { background: var(--success-50); color: var(--success-700); }
+.badge-info    { background: var(--info-50);    color: var(--info-700); }
+.badge-warning { background: var(--warning-50); color: var(--warning-700); }
+.badge-danger  { background: var(--danger-50);  color: var(--danger-700); }

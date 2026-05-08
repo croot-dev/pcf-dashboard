@@ -1,0 +1,35 @@
+{
+	"gitmoji.onlyUseCustomEmoji": true,
+	"gitmoji.addCustomEmoji": [
+	    {
+	      "emoji": "🔨",
+	      "code": ":hammer:",
+	      "description": "build : Add or update CI build system."
+	    },
+	    {
+	      "emoji": "📝",
+	      "code": ":memo:",
+	      "description": "doc : Add or update documentation."
+	    },
+	    {
+	      "emoji": "✨",
+	      "code": ":sparkles:",
+	      "description": "feat : Add, update, or remove feature."
+	    },
+	    {
+	      "emoji": "🐛",
+	      "code": ":bug:",
+	      "description": "fix : Fix a bug."
+	    },
+	    {
+	      "emoji": "♻️",
+	      "code": ":recycle:",
+	      "description": "refac : Refactor code."
+	    },
+	    {
+	      "emoji": "💄",
+	      "code": ":lipstick:",
+	      "description": "style : Add or update the UI and style files."
+	    },
+	],
+}

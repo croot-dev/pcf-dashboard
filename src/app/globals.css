@@ -1,26 +1,201 @@
-@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* --- Web fonts -------------------------------------------------- */
+/* JetBrains Mono: tabular figures for numeric tables. */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@import "tailwindcss";
+@import "../styles/token.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Pretendard Variable — self-hosted from fonts/ (uploaded by the brand team). */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PretendardVariable.woff2") format("truetype-variations"),
+       url("/fonts/PretendardVariable.woff2") format("truetype");
 }
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ---- Brand ------------------------------------------------- */
+  --color-brand-emerald:      var(--hl-emerald-500);
+  --color-brand-emerald-dark: var(--hl-emerald-600);
+  --color-brand-sky:          var(--hl-sky-500);
+  --color-brand-sky-dark:     var(--hl-sky-600);
+
+  /* ---- PCF domain (Scope 1/2/3) ------------------------------ */
+  --color-scope-1: var(--scope-1);
+  --color-scope-2: var(--scope-2);
+  --color-scope-3: var(--scope-3);
+
+  /* ---- Semantic status --------------------------------------- */
+  --color-success:        var(--success-500);
+  --color-success-subtle: var(--success-50);
+  --color-success-dark:   var(--success-700);
+
+  --color-info:        var(--info-500);
+  --color-info-subtle: var(--info-50);
+  --color-info-dark:   var(--info-700);
+
+  --color-warning:        var(--warning-500);
+  --color-warning-subtle: var(--warning-50);
+  --color-warning-dark:   var(--warning-700);
+
+  --color-danger:        var(--danger-500);
+  --color-danger-subtle: var(--danger-50);
+  --color-danger-dark:   var(--danger-700);
+
+  /* ---- Surfaces ---------------------------------------------- */
+  --color-bg:               var(--bg);
+  --color-bg-subtle:        var(--bg-subtle);
+  --color-bg-muted:         var(--bg-muted);
+  --color-surface:          var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border:           var(--border);
+  --color-border-strong:    var(--border-strong);
+
+  /* ---- Foreground -------------------------------------------- */
+  --color-fg-1:         var(--fg-1);
+  --color-fg-2:         var(--fg-2);
+  --color-fg-3:         var(--fg-3);
+  --color-fg-4:         var(--fg-4);
+  --color-fg-on-accent: var(--fg-on-accent);
+  --color-link:         var(--link);
+  --color-link-hover:   var(--link-hover);
+
+  /* ---- Font families ----------------------------------------- */
+  /* token.css의 --font-sans / --font-mono 를 Tailwind가 직접 참조  */
+  --font-sans:    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+                  "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-heading: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+                  "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+  --color-sidebar-ring:      var(--sidebar-ring);
+  --color-sidebar-border:      var(--sidebar-border);
+  --color-sidebar-accent-foreground:      var(--sidebar-accent-foreground);
+  --color-sidebar-accent:      var(--sidebar-accent);
+  --color-sidebar-primary-foreground:      var(--sidebar-primary-foreground);
+  --color-sidebar-primary:      var(--sidebar-primary);
+  --color-sidebar-foreground:      var(--sidebar-foreground);
+  --color-sidebar:      var(--sidebar);
+  --color-chart-5:      var(--chart-5);
+  --color-chart-4:      var(--chart-4);
+  --color-chart-3:      var(--chart-3);
+  --color-chart-2:      var(--chart-2);
+  --color-chart-1:      var(--chart-1);
+  --color-ring:      var(--ring);
+  --color-input:      var(--input);
+  --color-destructive:      var(--destructive);
+  --color-accent-foreground:      var(--accent-foreground);
+  --color-accent:      var(--accent);
+  --color-muted-foreground:      var(--muted-foreground);
+  --color-muted:      var(--muted);
+  --color-secondary-foreground:      var(--secondary-foreground);
+  --color-secondary:      var(--secondary);
+  --color-primary-foreground:      var(--primary-foreground);
+  --color-primary:      var(--primary);
+  --color-popover-foreground:      var(--popover-foreground);
+  --color-popover:      var(--popover);
+  --color-card-foreground:      var(--card-foreground);
+  --color-card:      var(--card);
+  --color-foreground:      var(--foreground);
+  --color-background:      var(--background);
+  --radius-sm:      calc(var(--radius) * 0.6);
+  --radius-md:      calc(var(--radius) * 0.8);
+  --radius-lg:      var(--radius);
+  --radius-xl:      calc(var(--radius) * 1.4);
+  --radius-2xl:      calc(var(--radius) * 1.8);
+  --radius-3xl:      calc(var(--radius) * 2.2);
+  --radius-4xl:      calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* shadcn semantics → token.css */
+  --background:           var(--bg);
+  --foreground:           var(--fg-1);
+  --card:                 var(--surface);
+  --card-foreground:      var(--fg-1);
+  --popover:              var(--surface-elevated);
+  --popover-foreground:   var(--fg-1);
+  --primary:              var(--hl-emerald-500);
+  --primary-foreground:   var(--fg-on-accent);
+  --secondary:            var(--bg-muted);
+  --secondary-foreground: var(--fg-2);
+  --muted:                var(--bg-muted);
+  --muted-foreground:     var(--fg-3);
+  --accent:               var(--bg-subtle);
+  --accent-foreground:    var(--fg-2);
+  --destructive:          var(--danger-500);
+  --border:               var(--slate-200);
+  --input:                var(--slate-200);
+  --ring:                 var(--info-500);
+  /* Chart → scope / semantic colors */
+  --chart-1: var(--scope-1);
+  --chart-2: var(--scope-2);
+  --chart-3: var(--scope-3);
+  --chart-4: var(--warning-500);
+  --chart-5: var(--danger-500);
+  --radius: 0.5rem;
+  /* Sidebar */
+  --sidebar:                    var(--surface);
+  --sidebar-foreground:         var(--fg-1);
+  --sidebar-primary:            var(--hl-emerald-500);
+  --sidebar-primary-foreground: var(--fg-on-accent);
+  --sidebar-accent:             var(--bg-subtle);
+  --sidebar-accent-foreground:  var(--fg-2);
+  --sidebar-border:             var(--slate-200);
+  --sidebar-ring:               var(--info-500);
+}
+
+.dark {
+  /* dark token values (token.css [data-theme="dark"]) */
+  --background:           #0b0f14;
+  --foreground:           #f1f5f9;
+  --card:                 #111922;
+  --card-foreground:      #f1f5f9;
+  --popover:              #15202d;
+  --popover-foreground:   #f1f5f9;
+  --primary:              var(--hl-emerald-500);
+  --primary-foreground:   #ffffff;
+  --secondary:            #131c27;
+  --secondary-foreground: #cbd5e1;
+  --muted:                #131c27;
+  --muted-foreground:     #94a3b8;
+  --accent:               #0f1620;
+  --accent-foreground:    #cbd5e1;
+  --destructive:          var(--danger-500);
+  --border:               #1f2a37;
+  --input:                #1f2a37;
+  --ring:                 var(--info-500);
+  /* Chart colors (same as light — scope colors don't change) */
+  --chart-1: var(--scope-1);
+  --chart-2: var(--scope-2);
+  --chart-3: var(--scope-3);
+  --chart-4: var(--warning-500);
+  --chart-5: var(--danger-500);
+  /* Sidebar */
+  --sidebar:                    #111922;
+  --sidebar-foreground:         #f1f5f9;
+  --sidebar-primary:            var(--hl-emerald-500);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             #0f1620;
+  --sidebar-accent-foreground:  #cbd5e1;
+  --sidebar-border:             #1f2a37;
+  --sidebar-ring:               var(--info-500);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
