@@ -7,6 +7,9 @@ npx prisma generate
 echo "Pushing schema to database..."
 npx prisma db push
 
+echo "Seeding initial data..."
+npx prisma db seed
+
 if [ "$NODE_ENV" = "development" ]; then
   export WATCHPACK_POLLING=true
   echo "Starting Next.js dev server..."

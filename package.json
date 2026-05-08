@@ -25,6 +25,7 @@
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.20",
     "lucide-react": "^1.14.0",
     "next": "16.2.5",
     "next-swagger-doc": "^0.4.1",

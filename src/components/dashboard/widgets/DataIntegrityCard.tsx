@@ -23,7 +23,7 @@ export function DataIntegrityCard({ counts, total }: Props) {
       <CardContent className="p-5 flex flex-col gap-2.5">
         {ROWS.map(({ key, label, sub, icon: Icon, color }) => {
           const count = counts[key]
-          const pct = (count / total) * 100
+          const pct = total > 0 ? (count / total) * 100 : 0
           return (
             <div key={key}>
               <div className="flex items-center gap-2 mb-1">

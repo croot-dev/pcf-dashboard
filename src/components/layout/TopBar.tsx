@@ -2,8 +2,15 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Download } from "lucide-react"
-import { PERIODS } from "@/lib/mock-data"
 import { usePageTitle } from "./TitleContext"
+
+const PERIODS = [
+    { id: "year", ko: "연간", en: "Annual", range: "2025 ALL" },
+  { id: "q1",   ko: "1Q", en: "Q1",      range: "2025 Q1"  },
+  { id: "q2",   ko: "2Q", en: "Q2",      range: "2025 Q2"  },
+  { id: "q3",   ko: "3Q", en: "Q3",      range: "2025 Q3"  },
+  { id: "q4",   ko: "4Q", en: "Q4",      range: "2025 Q4"  },
+]
 
 export function TopBar() {
   const pathname = usePathname()
@@ -12,7 +19,7 @@ export function TopBar() {
   const title = usePageTitle()
 
   const isOperDashboard = pathname === "/"
-  const period = searchParams.get("period") ?? "month"
+  const period = searchParams.get("period") ?? "year"
   const currentPeriod = PERIODS.find((p) => p.id === period) ?? PERIODS[0]
 
   function setPeriod(id: string) {
