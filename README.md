@@ -1,25 +1,20 @@
 # 탄소 관리 플랫폼 — PCF 대시보드
 
-제조사·물류사 등 기업 고객이 원소재·전기·운송 데이터를 입력하면 제품별 탄소 발자국(PCF)을 자동 계산하고 시각화하는 인터랙티브 대시보드.
+제품별 탄소 발자국(PCF)을 자동 계산하고 시각화하는 인터랙티브 대시보드.
 
----
+## 목차
 
-## 용어 정의
-
-**CO₂eq** — 모든 온실가스를 CO₂ 기준으로 환산한 단위. PCF는 항상 `kg CO₂eq` 로 표현.
-
-**PCF (Product Carbon Footprint)** — 제품 1단위 생산~폐기 전 과정의 온실가스 총량.  
-ISO 14067 / System Boundary: Cradle-to-Gate
-
-**GHG Scope** — 배출원을 통제 범위에 따라 3단계로 분류하는 GHG Protocol 기준.
-- **Scope 1**: 직접 배출 — 사업장 내 연소, 사내 차량
-- **Scope 2**: 간접 배출 — 구매 전력·열
-- **Scope 3**: 가치사슬 전체 — 원소재 조달, 제품 운송, 고객 사용 (통상 전체의 ~85%)
-
-**배출계수 (Emission Factor)** — 활동 1단위당 배출량. 공인 기관이 산업·지역별로 제공.  
-예) 한국 전력: `0.4567 kg CO₂eq/kWh`
-
-**LCA (Life Cycle Assessment)** — 원료 채취→생산→운송→사용→폐기 전 과정의 환경 영향 평가.
+- [시스템 설계](#시스템-설계)
+  - [아키텍처](#아키텍처)
+  - [DB 스키마 ERD](#db-스키마-erd)
+  - [페이지 구성](#페이지-구성)
+- [기술 스택](#기술-스택)
+- [로컬 실행 방법](#로컬-실행-방법)
+  - [Docker Compose](#docker-compose)
+  - [Yarn](#yarn)
+- [스크린샷 / 데모](#스크린샷--데모)
+- [AI 활용 내역](#ai-활용-내역)
+- [회고 및 개선 방향](#회고-및-개선-방향)
 
 ---
 
@@ -27,34 +22,27 @@ ISO 14067 / System Boundary: Cradle-to-Gate
 
 ### 아키텍처
 
+```mermaid
+flowchart LR
+    user[사용자] --> ui[Next.js 화면]
+    ui --> api[API Routes]
+    api --> logic[도메인 로직<br/>검증 · 계산 · 집계]
+    logic --> db[(PostgreSQL)]
+    api -.-> docs[Swagger<br/>/api-doc]
 ```
-Browser
-  └─ Next.js App Router (Vercel / Docker)
-       ├─ /app          → React 페이지 (RSC + Client)
-       ├─ /app/api      → API Routes (엑셀 파싱·계산·저장)
-       └─ Prisma ORM
-            └─ PostgreSQL (Docker Compose)
-```
 
-### 설계 고려사항
+Next.js App Router 안에서 화면과 API Route를 함께 구성
+실무자 화면은 엑셀 업로드와 검증을 담당
+경영자 화면은 저장된 데이터를 집계해 PCF·Scope·월별 추이를 표현
 
-1. emission_factors를 별도 테이블로 분리 + 버전 이력 관리
-  - 배출계수는 정부·기관이 주기적으로 갱신.
-  - 계수를 activity_data에 직접 박으면 과거 데이터 재현이 불가능
-  - `valid_from` / `valid_to` 컬럼으로 시점별 계수를 추적, import 시점의 계수 ID를 `activity_data`에 고정 저장.
-
-2. emissions 테이블에 계산 결과를 사전 저장 (pre-computed)
-  - 대시보드 조회마다 `amount × factor`를 실시간 계산하면 성능 리스크  
-  - import 시점에 API Route에서 계산 후 저장. 조회는 단순 SELECT + SUM.
-
-3. raw_data_json 보관
-  - 파싱 실패 시 원본을 재처리 필요성 고려...  
-  - 엑셀 행 전체를 JSONB로 보관해 언제든 재파싱 및 디버깅 가능.
+Docker Compose는 `app`과 `db` 두 컨테이너로 구성
+`app` 시작 시 Prisma가 PostgreSQL 스키마를 동기화하고, API 문서는 `/api-doc`에서 확인할 수 있습니다.
 
 
 ### DB 스키마 (ERD)
 
-> 상세 ERD: [`schema.vuerd.json`](./schema.vuerd.json) — ERD Editor(dineug) VSCode 확장으로 열기
+활동 데이터, 배출계수, 계산 결과를 분리.
+배출계수는 버전 이력이 필요하고, 계산 결과는 대시보드 조회 성능을 위해 별도 저장
 
 ```mermaid
 erDiagram
@@ -68,6 +56,9 @@ erDiagram
 
 ```
 
+> 상세 ERD: [`schema.vuerd.json`](./schema.vuerd.json) — ERD Editor(dineug) VSCode 확장 필요.
+![ERD](./docs/images/erd.jpg)
+
 | 테이블 | 역할 |
 |--------|------|
 | `products` | 제품 목록 |
@@ -77,46 +68,12 @@ erDiagram
 | `production_batches` | 생산량 기록 → 단위당 PCF 분모 |
 
 
+### 페이지 구성
 
-### 페이지 구성안
-
-```
-/            경영자 대시보드
-               · PCF 요약 KPI 카드 (단위: kgCO₂e/개)
-               · Scope별 배출량 파이차트 (비율 + 절댓값 툴팁)
-               · 월별 배출량 트렌드 차트 (Recharts LineChart)
-
-/data        실무자 데이터 관리
-               · 엑셀 업로드 → DB 자동 임포트
-               · 활동 데이터 테이블 (pagination · sorting · filtering)
-               · 오류 행 목록 + 에러 메시지 표시
-               · 배출계수 목록 + 버전 이력 조회
-
-```
-
-### 엑셀 임포트 흐름
-
-```
-파일 선택 -> 시트 및 컬럼 매핑 확인
-  -> [검증] 유효성 검사 및 DB 중복 대조
-  -> [미리보기] 정상, 중복(Conflict), 오류 행 분류
-  -> [사용자 결정] 중복 데이터 업데이트 여부 선택
-  -> [반영] 최종 임포트 및 결과 리포트 출력
-```
-
-- 중복 처리 (Conflict Resolution): 단순 skip 대신 '기존 데이터 업데이트' 옵션을 제공해 실무자 실수 방지 및 데이터 최신성 유지.
-- 행별 정밀 검증: 날짜 포맷, 필수값 누락, 미등록 단위를 필터링하여 구체적인 에러 메시지 제공.
-- 데이터 추적성: 임포트 시점의 배출계수 버전 고정(Snapshot) 및 원본 JSONB 보관으로 계산 근거 확보.
-
-### 계산 로직
-
-```
-emissions.co2e = activity_data.amount × emission_factors.factor
-PCF (kgCO₂e/개) = SUM(emissions.co2e) / production_batches.produced_quantity
-```
-
-API Route에서 계산 후 DB 저장. 대시보드는 저장된 값을 조회 (계산 로직 중복 없음).  
-모든 수치는 `kgCO₂e` 단위로 표시하며, 소수점 2자리 포맷팅 적용.
+| 경로 | 대상 | 주요 기능 |
+|------|------|-----------|
+| `/` | 경영자 | 연도별 PCF 요약 KPI, 월별 배출량, 배출원 비중, 제품·배출원별 PCF 상세, 전월·전년 대비 추이 |
+| `/operator` | 실무자 | 엑셀 업로드, 컬럼 매핑, 유효성 검사, 오류 행 수정, DB 반영, 배출계수 버전 추가·조회 |
 
 ---
 
@@ -139,180 +96,119 @@ Next.js · TypeScript · Prisma · PostgreSQL · Tailwind CSS · shadcn/ui · Re
 
 ## 로컬 실행 방법
 
-환경 구분은 `.env`의 `NODE_ENV`로 제어합니다. `.env`가 없으면 production으로 동작합니다.
-
-### Docker (개발)
+### Docker Compose
 
 ```bash
 # 저장소 클론
 git clone https://github.com/croot-dev/pcf-dashboard && cd pcf-dashboard
 
-# 환경 변수 설정
-cp .env.example .env
-# .env 열어서 NODE_ENV=development 로 변경
-
-# 빌드 및 기동 (PostgreSQL + Next.js dev 서버)
-docker-compose up --build
-# → http://localhost:3000 (hot-reload 활성화)
+# PostgreSQL + Next.js 앱 실행
+docker compose up --build
 ```
 
-### Docker (운영)
+접속: http://localhost:3000
+
+기본값으로 바로 실행되도록 구성되어 있어 `.env` 파일은 없어도 됩니다. hot reload가 필요하거나 포트, DB 계정명을 바꾸고 싶을 때만 `.env.example`을 복사해 수정하세요.
 
 ```bash
-# .env 없이 실행하거나, NODE_ENV=production 으로 설정
-docker-compose up --build
-# → http://localhost:3000 (production 빌드)
+cp .env.example .env
 ```
 
----
+개발 중 hot reload가 필요하면 `.env`에 `NODE_ENV=development`를 설정한 뒤 실행합니다.
 
-## 대시보드 구성안
+```bash
+docker compose up --build
+```
 
-### 경영자
-1. Current
-  - 누적 총 CO₂e (kgCO₂e) — 가장 크게 강조
-  - 평균 단위당 PCF (kgCO₂e/개) — 핵심 경영 지표
-  - 최근 업데이트: 마지막 데이터 임포트 시점 + 총 레코드 수
+초기 샘플 데이터가 필요하면 최초 실행 시에만 `SEED_DB=true`를 붙입니다.
 
-2. Trend & Comparison
-  - 월별 배출량 추이 라인차트 (CO₂e + 생산량 이중 축 오버레이)
-  - 제품별 단위당 PCF 수평 바차트 (높은 순 정렬)
-  - 전월 대비 증감률 (%) + 상승/하락 인디케이터
+```bash
+SEED_DB=true docker compose up --build
+```
 
-3. Hotspot
-  - 배출원 TOP 3: 활동 유형별(전기/운송/원소재 등) CO₂e 기여도 수평 바차트
-  - Scope 1/2/3 비중: 도넛차트 (호버 시 절댓값 툴팁)
-  - 고배출 제품 리스트: 단위당 PCF 상위 제품 테이블 (전월 대비 증감 컬럼 포함)
+컨테이너 시작 시 Prisma가 자동으로 `prisma db push`를 실행해 DB 스키마를 동기화합니다. Docker Compose 실행 시에는 `docker-compose.yml`에서 앱 컨테이너용 `DATABASE_URL`을 주입합니다.
 
+### Yarn
+
+Node.js 22.x와 Yarn 1.x 기준입니다. 앱은 로컬에서 실행하고 PostgreSQL만 Docker Compose로 띄웁니다. Prisma는 `prisma.config.ts`에서 `.env`를 읽고, `DATABASE_URL`이 없으면 `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`으로 연결 URL을 만듭니다.
+
+```bash
+# PostgreSQL 실행
+docker compose up -d db
+
+# 환경 변수 파일 생성
+cp .env.example .env
+
+# 의존성 설치
+yarn install --frozen-lockfile
+
+# DB 스키마 동기화 및 Prisma Client 생성
+yarn db:push && yarn db:generate
+
+# 개발 서버 실행
+yarn dev
+```
+
+접속: http://localhost:3000
+
+production 실행을 확인하려면 아래처럼 빌드 후 시작합니다.
+
+```bash
+yarn build
+yarn start
+```
+
+초기 샘플 데이터가 필요하면 `yarn db:seed`를 한 번 실행합니다.
 
 ---
 
 ## 스크린샷 / 데모
 
-> 구현 완료 후 추가 예정
+UI 실행 과정과 비디오 캡처 순서는 [UI 실행 과정](./docs/ui-demo-guide.md)에 정리했습니다.
 
----
+### 경영자 대시보드
 
-## 개발 로그
+연도별 총 배출량, 단위 PCF, Scope별 월별 추이, 배출원 비중, 배출원별 PCF 상세를 한 화면에서 확인합니다.
 
-### Day 1
+![경영자 대시보드](./docs/images/executive_dashboard.jpg)
 
-- 도메인 학습 및 용어 정리
-- 과제 데이터 분석 및 구현 계획 수립
-- DB 스키마 설계 (ERD Editor)
-- 초기 프로젝트 구조 작성
+### 실무자 대시보드
 
-### Day 2
+엑셀 업로드, 컬럼 매핑, 유효성 검사, 오류 행 수정, 배출계수 버전 관리를 한 흐름으로 처리합니다.
 
----
+![실무자 대시보드](./docs/images/operator_dashboard.jpg)
 
-## 작업 시간 기록
+### 엑셀 임포트 화면
 
-| 항목 | 소요 시간 |
-|------|----------|
-| 도메인 학습 및 설계 | .5 M/D |
-| 프로젝트 세팅 | .5 M/D |
-| 대시보드 기획 | - |
-| API/UI 구현 | - |
+과제용 Excel 데이터를 업로드한 뒤 매핑과 검증 결과를 확인하고, 정상 데이터만 DB에 반영합니다.
 
-| **총계** | - |
-
-**시간이 많이 소요된 부분**: (완료 후 기록)
+![실무자 엑셀 임포트](./docs/images/operator_dashboard_import.jpg)
 
 ---
 
 ## AI 활용 내역
 
-### 요구분석 및 도메인 학습
+빠르게 초안을 만들 수 있는 영역과 검증에 집중적으로 활용
 
-**작업내용**
-- 도메인 컨텍스트 분석: 탄소발자국 및 PCF 등 비즈니스 핵심 용어 관련 지식 습득.
-- 요구분석: 데이터 수집부터 계산, 리포팅까지 이어지는 기능적 요구사항 구체화.
+- 탄소 회계 용어와 PCF 계산 흐름 정리
+- 경영자/실무자 관점의 인사이트 있는 대시보드 후보 도출
+- API 응답 구조, Swagger 주석, 테스트 데이터 생성
+- Claude Design을 활용한 초기 디자인 시스템 방향 탐색
+- README 체크리스트 누락 여부 점검
 
-**Prompt 예시**
-- "PCF 산출 시스템 설계 전, 제품 단위 배출량 계산에 반드시 반영되어야 할 변수와 국내외 공시 기준에서 요구하는 데이터 무결성 요건을 정리해 줘."
-- "실무자가 엑셀로 데이터를 관리할 때 발생하는 가장 빈번한 오류 유형들을 나열하고, 이를 요구사항 명세에 어떻게 반영할지 제안해 줘."
-
-**결정근거**
-- 분석의 정밀도 향상: 생소한 도메인 지식을 빠르게 구조화하여 요구분석 단계에서 발생할 수 있는 지식의 공백을 선제적으로 보완.
-- 비즈니스 타당성 검토: AI와의 질의응답을 통해 도메인 전문가의 시각에서 설계를 검토함으로써, 실제 비즈니스 가치가 있는 유효 요구사항 선별.
-
-### 시스템 설계 및 기술스택 선정
-
-**작업내용**
-- 기술 스택 후보군 교차 검증: 기술 호환성 및 설정 리스크 검토 지시.
-- DB 스키마 베이스라인 생성: 탄소 회계 도메인에 필요한 기본 테이블 구조에 대한 초안 가이드 생성 및 성능 검증.
-- 기술 스택 전략 수립: 기능 구현 범위 지정 및 과제 요구사항에 맞는 초기 파일구조 자동 생성
-
-**Prompt 활용 전략**
-- README.md 파일을 기반으로 프로젝트 개발 환경을 구축 해주고 라이브러리 간 버전 충돌 가능성이나 컨테이너 빌드 최적화 측면에서 주의해야 할 체크리스트를 알려줘"
-- 도메인 모델링 베이스라인 요청: "PCF 산출을 위해 제품, 활동 데이터, 배출계수 간의 관계를 정의하는 스키마 초안을 작성"
-- 스캐폴딩 및 범위 구체화: "주어진 과제 요구사항을 바탕으로 적절한 스케일의 폴더 구조 제안 및 보일러플레이트 작성"
-
-**결정 근거**
-- 인프라 리스크 사전 차단: 직접 선정한 기술 스택의 잠재적 결함(Connection Leak, 컨테이너 오버헤드 등)을 AI로 교차 검증하여 환경 구축 시간을 단축하고 운영 안정성 확보.
-- 데이터 설계의 확장성 확보: AI가 제안한 기초 뼈대를 바탕으로 버전 관리와 원본 데이터 보존 등 실무적 세부 사항을 직접 덧붙여 도메인에 최적화된 DB 구조 확립.
-- 개발 생산성 극대화: 프로젝트 초기 설정 및 폴더 구조 생성 등 반복적인 보일러플레이트 작업을 자동화하고, 구현 범위에 대한 객관적 우선순위를 검토하여 제한된 시간 내 고품질 산출물 도출.
-
-
-### 경영자 대시보드 기획
-```
-## 프로젝트 개요
-탄소 발자국(PCF) 관리 SaaS의 경영자용 대시보드 페이지를 디자인해줘.
-제조사·물류사 기업 고객이 제품별 탄소 배출량을 파악하고 의사결정하는 화면이야.
-
-## 기술 스택
-Next.js, TypeScript, Tailwind CSS, shadcn/ui, Recharts
-
-## 페이지 구조
-단일 페이지에 아래 3개 섹션이 세로로 흐르는 레이아웃.
-상단에 기간 필터(월/분기/연도 선택)가 고정되어 있고, 필터 변경 시 전 섹션 연동.
+조금 더 상세한 AI 활용 내역은 ["./docs/ai-used.md"](./docs/ai-used.md)에 정리했습니다.
 
 ---
 
-### 섹션 1 — 현재 (Current Status)
-"지금 우리 수준은?"
+## 회고 및 개선 방향
 
-KPI 카드 3개 가로 배열:
-- 누적 총 CO₂e (kgCO₂e) — 가장 크게 강조
-- 평균 단위당 PCF (kgCO₂e/개) — 핵심 경영 지표
-- 최근 업데이트: 마지막 데이터 임포트 시점 + 총 레코드 수
+오랜만의 대시보드 작업 재미있었습니다. :)
+초기에는 탄소 회계 도메인에 대한 이해가 충분하지 않은 상태에서 화면과 DB 스키마를 먼저 설계했습니다. 그 결과 스키마 구조가 좀 이상하게 되었고, 경영자 대시보드 역시 PCF 지표와 Scope별 해석이 부족하다는 점을 뒤늦게 파악했습니다.
 
----
+이후 PCF 계산 흐름과 사용자 관점을 다시 정리하면서 DB 스키마와 경영자 대시보드를 전면 수정했습니다. 이 과정에서 도메인 이해가 설계 품질에 직접적인 영향을 준다는 점을 크게 느꼈습니다.
 
-### 섹션 2 — 비교 (Trend & Comparison)
-"잘하고 있나?"
-
-차트 2개:
-- 월별 배출량 추이 라인차트 (CO₂e + 생산량 이중 축 오버레이)
-- 제품별 단위당 PCF 수평 바차트 (높은 순 정렬)
-
-카드 1개:
-- 전월 대비 증감률 (%) + 상승/하락 인디케이터
-
----
-
-### 섹션 3 — 분석 (Risk & Hotspot)
-"어디에 집중해야 하나?"
-
-- 배출원 TOP 3: 활동 유형별(전기/운송/원소재 등) CO₂e 기여도 수평 바차트
-- Scope 1/2/3 비중: 도넛차트 (호버 시 절댓값 툴팁)
-- 고배출 제품 리스트: 단위당 PCF 상위 제품 테이블 (전월 대비 증감 컬럼 포함)
-
----
-
-## 디자인 방향
-- 데이터 중심의 깔끔한 대시보드. 화려함보다 가독성 우선.
-- 경영자가 30초 안에 현황을 파악할 수 있어야 함.
-- 증가(악화)는 빨간색, 감소(개선)는 초록색으로 일관되게 표현.
-- 탄소/환경 도메인이지만 그린워싱 느낌의 초록 테마는 피할 것.
-- 라이트 모드 기준. shadcn/ui 컴포넌트 최대한 활용.
-```
-
-
----
-
-# TODO
-- react-animated-numbers 붙이기
-- 동적 위젯 구현
-- 경영자 대시보드 Print용 리포트 UI 
+**추가 개선 방향**
+- 사용자 관점별 필터 세분화
+- Scope별 상세 View 고도화
+- 동적 위젯 기반 대시보드 확장
+- 리포트 PDF/CSV 내보내기
