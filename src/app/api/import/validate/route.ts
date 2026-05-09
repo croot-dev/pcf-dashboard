@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { summarizeImportRows }  from "@/lib/upload"
 import {
   buildExistingActivityKeys,
   getActiveEmissionFactors,
   getFactorMatches,
   getImportMappings,
-  summarizeImportRows,
   validateImportRows,
 } from "@/lib/upload/import"
-import type { ColumnMapping, ImportRow } from "@/lib/upload/types"
+import type { ColumnMapping, ImportRow } from "@/lib/upload"
 
 export const dynamic = "force-dynamic"
 
@@ -35,14 +35,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const rows = z.array(ImportRowSchema).parse(body.rows) as ImportRow[]
-    const mappings: ColumnMapping[] = Array.isArray(body.mappings) ? body.mappings : getImportMappings()
+    const mappings: ColumnMapping[] = Array.isArray(body.mappings) ? body.mappings : await getImportMappings()
     const sourceHeaders: string[] = Array.isArray(body.sourceHeaders) ? body.sourceHeaders : []
     const [factors, factorMatches, existingKeys] = await Promise.all([
       getActiveEmissionFactors(),
       getFactorMatches(),
       buildExistingActivityKeys(),
     ])
-    const validatedRows = validateImportRows(rows, factorMatches, existingKeys)
+    const validatedRows = await validateImportRows(rows, factorMatches, existingKeys)
 
     return NextResponse.json({
       fileName: body.fileName ?? "edited-preview",

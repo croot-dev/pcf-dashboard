@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { OperEmissionFactor } from "@/lib/upload/types"
+import type { OperEmissionFactor } from "@/lib/upload"
 
 type Props = {
   factors: OperEmissionFactor[]
@@ -31,7 +31,7 @@ function factorKey(f: OperEmissionFactor) {
 
 function groupFactors(factors: OperEmissionFactor[]): FactorGroup[] {
   const map = new Map<string, OperEmissionFactor[]>()
-  for (const f of factors) {
+  for (const f of factors.filter((factor) => factor.validFrom)) {
     const k = factorKey(f)
     const bucket = map.get(k) ?? []
     map.set(k, [...bucket, f])

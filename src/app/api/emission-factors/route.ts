@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       })
     })
 
-    return NextResponse.json({ factor: toOperEmissionFactor(created) }, { status: 201 })
+    return NextResponse.json({ factor: await toOperEmissionFactor(created) }, { status: 201 })
   } catch (error) {
     console.error("Failed to create emission factor version", error)
     return NextResponse.json({ error: "배출계수 버전을 추가하지 못했습니다." }, { status: 400 })

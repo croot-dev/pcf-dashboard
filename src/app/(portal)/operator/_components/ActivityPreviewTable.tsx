@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import type { ImportRow, ImportSummary } from "@/lib/upload/types"
+import type { ImportRow, ImportSummary } from "@/lib/upload"
 import { getStatusBadgeVariant, getStatusLabel } from "./operator-ui"
 
 type Props = {

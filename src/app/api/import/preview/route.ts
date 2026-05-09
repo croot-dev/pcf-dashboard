@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
+import { summarizeImportRows }  from "@/lib/upload"
 import {
   buildExistingActivityKeys,
   getActiveEmissionFactors,
   getFactorMatches,
   parseWorkbook,
-  summarizeImportRows,
   validateImportRows,
 } from "@/lib/upload/import"
 
@@ -19,13 +19,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Excel 파일이 필요합니다." }, { status: 400 })
     }
 
-    const parsed = parseWorkbook(await file.arrayBuffer())
+    const parsed = await parseWorkbook(await file.arrayBuffer())
     const [factors, factorMatches, existingKeys] = await Promise.all([
       getActiveEmissionFactors(),
       getFactorMatches(),
       buildExistingActivityKeys(),
     ])
-    const rows = validateImportRows(parsed.rows, factorMatches, existingKeys)
+    const rows = await validateImportRows(parsed.rows, factorMatches, existingKeys)
 
     return NextResponse.json({
       fileName: file.name,

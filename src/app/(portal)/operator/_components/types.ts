@@ -1,4 +1,4 @@
-import type { ImportRow } from "@/lib/upload/types"
+import type { ImportRow } from "@/lib/upload"
 
 export type FlowStepName = "upload" | "mapping" | "validation" | "commit"
 

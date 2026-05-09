@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { useDropzone } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import type { ImportSummary } from "@/lib/upload/types"
+import type { ImportSummary } from "@/lib/upload"
 import type { FlowStep, FlowStepName } from "./types"
 import { getValidationColor } from "./operator-ui"
 

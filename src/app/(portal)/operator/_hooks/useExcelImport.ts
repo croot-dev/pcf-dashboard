@@ -9,9 +9,9 @@ import type {
   ImportRow,
   ImportSummary,
   OperEmissionFactor,
-} from "@/lib/upload/types"
+} from "@/lib/upload"
 import type { EditableImportField, FlowStepName } from "../_components/types"
-import { MAPPINGS } from "@/lib/upload/constants"
+import { MAPPINGS } from "@/lib/upload"
 
 const EMPTY_SUMMARY: ImportSummary = {
   total: 0,

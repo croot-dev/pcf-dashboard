@@ -10,9 +10,8 @@ import { EmissionFactorHistory } from "./_components/EmissionFactorHistory"
 import { EmissionFactorVersionForm } from "./_components/EmissionFactorVersionForm"
 import { UploadFilePanel } from "./_components/UploadFilePanel"
 import { RowEvidenceEditor } from "./_components/RowEvidenceEditor"
-// import { TaskProgressCard } from "./_components/TaskProgressCard"
 import type { FactorForm, FlowStepName } from "./_components/types"
-import type { OperEmissionFactor } from "@/lib/upload/types"
+import type { OperEmissionFactor } from "@/lib/upload/"
 
 const ACTIVITY_COLORS = ["#8b5cf6", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#ec4899"]
 
@@ -74,23 +73,6 @@ export default function OperatorPage() {
     [currentStep]
   )
 
-  const taskProgress = useMemo(() => {
-    const seen = new Map<string, { done: number; total: number }>()
-    for (const row of rows) {
-      const type = row.activityType || "(미분류)"
-      const entry = seen.get(type) ?? { done: 0, total: 0 }
-      entry.total += 1
-      if (row.status !== "error") entry.done += 1
-      seen.set(type, entry)
-    }
-    return Array.from(seen.entries()).map(([activityType, { done, total }], i) => ({
-      activityType,
-      color: ACTIVITY_COLORS[i % ACTIVITY_COLORS.length],
-      done,
-      total,
-    }))
-  }, [rows])
-
   const [factorsList, setFactorsList] = useState<OperEmissionFactor[]>([])
   const [factorForm, setFactorForm] = useState<FactorForm>(INITIAL_FACTOR_FORM)
 
@@ -148,8 +130,6 @@ export default function OperatorPage() {
           onCommit={commitRows}
         />
 
-        {/* <TaskProgressCard tasks={taskProgress} /> */}
-        
         <RowEvidenceEditor
           row={selectedRow}
           isLoading={isLoading}

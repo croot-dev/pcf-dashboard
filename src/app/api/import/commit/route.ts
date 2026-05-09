@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+
+import { summarizeImportRows }  from "@/lib/upload"
 import {
   buildExistingActivityKeys,
   ensureProduct,
   getFactorMatches,
   getParsedAmount,
   getParsedDate,
-  summarizeImportRows,
   validateImportRows,
 } from "@/lib/upload/import"
-import type { ImportRow } from "@/lib/upload/types"
+import type { ImportRow } from "@/lib/upload"
 
 export const dynamic = "force-dynamic"
 
@@ -91,15 +92,15 @@ export async function POST(request: Request) {
       getFactorMatches(),
       buildExistingActivityKeys(),
     ])
-    const validatedRows = validateImportRows(rows, factorMatches, existingKeys)
+    const validatedRows = await validateImportRows(rows, factorMatches, existingKeys)
     const importableRows = validatedRows.filter((row) => row.status !== "error")
 
     let saved = 0
     let updated = 0
 
     for (const row of importableRows) {
-      const date = getParsedDate(row)
-      const amount = getParsedAmount(row)
+      const date = await getParsedDate(row)
+      const amount = await getParsedAmount(row)
       const factor = row.factor
 
       if (!date || !row.emissionFactorId || factor === null || row.co2e === null) continue

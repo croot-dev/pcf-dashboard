@@ -11,9 +11,67 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import type { ImportRow } from "@/lib/upload/types"
+import type { ImportRow } from "@/lib/upload"
 import type { EditableImportField } from "./types"
 import { getStatusBadgeVariant, getStatusLabel } from "./operator-ui"
+
+const FIELD_LABEL: Record<EditableImportField, string> = {
+  date: "날짜",
+  activityType: "활동유형",
+  sourceName: "배출원",
+  unit: "단위",
+  amount: "사용량",
+}
+
+function parseAmount(value: string) {
+  const normalized = value.replace(/,/g, "").trim()
+  if (normalized === "") return Number.NaN
+  return Number(normalized)
+}
+
+function getFieldError(field: EditableImportField, value: string) {
+  const trimmed = value.trim()
+
+  if (field !== "amount" && trimmed === "") return `${FIELD_LABEL[field]}은 필수입니다.`
+
+  if (field === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return "날짜는 YYYY-MM-DD 형식이어야 합니다."
+  }
+
+  if (field === "amount") {
+    const amount = parseAmount(trimmed)
+    if (!Number.isFinite(amount) || amount < 0) return "사용량은 0 이상의 숫자여야 합니다."
+  }
+
+  return null
+}
+
+function FieldInput({
+  field,
+  value,
+  className,
+  onChange,
+}: {
+  field: EditableImportField
+  value: string
+  className?: string
+  onChange: (field: EditableImportField, value: string) => void
+}) {
+  const error = getFieldError(field, value)
+
+  return (
+    <label className={`space-y-1 ${className ?? ""}`}>
+      <span className="text-[10px] font-medium text-muted-foreground">{FIELD_LABEL[field]}</span>
+      <Input
+        value={value}
+        aria-invalid={Boolean(error)}
+        onChange={(e) => onChange(field, e.target.value)}
+        className={error ? "border-danger focus-visible:ring-danger/40" : undefined}
+      />
+      {error && <span className="block text-[10px] leading-tight text-danger">{error}</span>}
+    </label>
+  )
+}
 
 type Props = {
   row: ImportRow | null
@@ -23,6 +81,11 @@ type Props = {
 }
 
 export function RowEvidenceEditor({ row, isLoading, onChange, onRevalidate }: Props) {
+  const hasClientErrors = row
+    ? (["date", "activityType", "sourceName", "unit", "amount"] as EditableImportField[])
+      .some((field) => getFieldError(field, row[field]))
+    : false
+
   return (
     <Card className="col-span-4 py-0">
       <CardHeader className="border-b px-5 py-3">
@@ -36,11 +99,11 @@ export function RowEvidenceEditor({ row, isLoading, onChange, onRevalidate }: Pr
         {row ? (
           <>
             <div className="grid grid-cols-2 gap-2">
-              <Input value={row.date} onChange={(e) => onChange("date", e.target.value)} />
-              <Input value={row.activityType} onChange={(e) => onChange("activityType", e.target.value)} />
-              <Input value={row.sourceName} onChange={(e) => onChange("sourceName", e.target.value)} />
-              <Input value={row.unit} onChange={(e) => onChange("unit", e.target.value)} />
-              <Input className="col-span-2" value={row.amount} onChange={(e) => onChange("amount", e.target.value)} />
+              <FieldInput field="date" value={row.date} onChange={onChange} />
+              <FieldInput field="activityType" value={row.activityType} onChange={onChange} />
+              <FieldInput field="sourceName" value={row.sourceName} onChange={onChange} />
+              <FieldInput field="unit" value={row.unit} onChange={onChange} />
+              <FieldInput field="amount" value={row.amount} className="col-span-2" onChange={onChange} />
             </div>
 
             <div className="rounded-lg border bg-muted/30 p-4">
@@ -81,9 +144,9 @@ export function RowEvidenceEditor({ row, isLoading, onChange, onRevalidate }: Pr
               </div>
             )}
 
-            <Button className="w-full" size="sm" disabled={isLoading} onClick={onRevalidate}>
+            <Button className="w-full" size="sm" disabled={isLoading || hasClientErrors} onClick={onRevalidate}>
               <RefreshCw />
-              수정 값 다시 검증
+              {hasClientErrors ? "입력값을 먼저 확인하세요" : "수정 값 다시 검증"}
             </Button>
           </>
         ) : (

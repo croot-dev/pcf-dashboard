@@ -1,15 +1,16 @@
+'use server'
+import "server-only"
+
 import * as XLSX from "xlsx"
 import dayjs from "@/lib/dayjs"
 import { prisma } from "@/lib/prisma"
 import type {
   ColumnMapping,
   ImportRow,
-  ImportSummary,
-  ImportStatus,
   OperEmissionFactor,
-} from "@/lib/upload/types"
-import { MAPPINGS } from "@/lib/upload/constants"
-export { MAPPINGS }
+} from "./types"
+import { MAPPINGS } from "./constants"
+import { getStatus, isRowMostlyEmpty, normalizeHeader, parseDate, round, toNumber } from "./helpers"
 
 const ERR_DATE_FORMAT    = "날짜는 YYYY-MM-DD 형식이어야 합니다."
 const ERR_ACTIVITY_TYPE  = "활동 유형은 필수입니다."
@@ -59,17 +60,6 @@ type ExistingActivityKey = {
 
 type DetectedColumns = Partial<Record<ImportField, number>>
 
-function normalizeHeader(value: unknown) {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[()[\]{}·_\-/]/g, "")
-}
-
-function isRowMostlyEmpty(row: unknown[]) {
-  return row.every((cell) => String(cell ?? "").trim() === "")
-}
 
 function getCell(row: unknown[], index: number | undefined) {
   if (index === undefined) return ""
@@ -160,25 +150,6 @@ function toIsoDate(date: Date) {
   return dayjs.utc(date).format("YYYY-MM-DD")
 }
 
-function toNumber(value: string) {
-  const normalized = value.replace(/,/g, "").trim()
-  if (normalized === "") return Number.NaN
-  return Number(normalized)
-}
-
-function round(value: number, digits = 4) {
-  return Number(value.toFixed(digits))
-}
-
-function parseDate(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null
-
-  const d = dayjs.utc(value)
-  if (!d.isValid()) return null
-
-  return d.toDate()
-}
-
 function findFactor(row: ImportRow, factors: FactorMatch[]) {
   const date = parseDate(row.date)
   if (!date) return null
@@ -195,28 +166,12 @@ function findFactor(row: ImportRow, factors: FactorMatch[]) {
   )
 }
 
-function getStatus(errors: string[], warnings: string[]): ImportStatus {
-  if (errors.length > 0) return "error"
-  if (warnings.length > 0) return "warning"
-  return "valid"
-}
-
 function buildExistingKey(row: ExistingActivityKey) {
   return [row.date, row.activityType, row.sourceName, row.unit].join("|")
 }
 
-export function summarizeImportRows(rows: ImportRow[]): ImportSummary {
-  return {
-    total: rows.length,
-    valid: rows.filter((row) => row.status === "valid").length,
-    warning: rows.filter((row) => row.status === "warning").length,
-    error: rows.filter((row) => row.status === "error").length,
-    duplicate: rows.filter((row) => row.warnings.some((warning) => warning.includes("중복"))).length,
-  }
-}
-
-export function toOperEmissionFactor(factor: FactorMatch): OperEmissionFactor {
-  return {
+export async function toOperEmissionFactor(factor: FactorMatch): Promise<OperEmissionFactor> {
+  return Promise.resolve({
     id: factor.id,
     activityType: factor.activityType,
     sourceName: factor.sourceName,
@@ -225,7 +180,7 @@ export function toOperEmissionFactor(factor: FactorMatch): OperEmissionFactor {
     factor: Number(factor.factor),
     validFrom: toIsoDate(factor.validFrom),
     validTo: factor.validTo ? toIsoDate(factor.validTo) : null,
-  }
+  })
 }
 
 export async function getActiveEmissionFactors() {
@@ -234,7 +189,7 @@ export async function getActiveEmissionFactors() {
     orderBy: [{ activityType: "asc" }, { sourceName: "asc" }, { validFrom: "desc" }],
   })
 
-  return factors.map(toOperEmissionFactor)
+  return Promise.all(factors.map(toOperEmissionFactor))
 }
 
 export async function getFactorMatches() {
@@ -293,7 +248,7 @@ function findBestSheet(workbook: XLSX.WorkBook) {
   return { sheetName: bestSheetName, matrix: bestMatrix, detected: bestDetected }
 }
 
-export function parseWorkbook(buffer: ArrayBuffer) {
+export async function parseWorkbook(buffer: ArrayBuffer) {
   const workbook = XLSX.read(buffer, { type: "array", cellDates: false })
   const { sheetName, matrix, detected } = findBestSheet(workbook)
   const autoDetected = detected.score >= 3
@@ -352,43 +307,45 @@ export function parseWorkbook(buffer: ArrayBuffer) {
   }
 }
 
-export function validateImportRows(
+export async function validateImportRows(
   rows: ImportRow[],
   factors: FactorMatch[],
   existingKeys: Set<string>
-): ImportRow[] {
+): Promise<ImportRow[]> {
   const seenKeys = new Set<string>()
 
-  return rows.map((row) => {
-    const errors: string[] = [...row.errors]
-    const warnings: string[] = []
-    const date = parseDate(row.date)
-    const amount = toNumber(row.amount)
+  return Promise.resolve(
+    rows.map((row) => {
+      const errors: string[] = [...row.errors]
+      const warnings: string[] = []
+      const date = parseDate(row.date)
+      const amount = toNumber(row.amount)
 
-    if (!date) errors.push(ERR_DATE_FORMAT)
-    if (!row.activityType) errors.push(ERR_ACTIVITY_TYPE)
-    if (!row.sourceName) errors.push(ERR_SOURCE_NAME)
-    if (!row.unit) errors.push(ERR_UNIT)
-    if (!Number.isFinite(amount) || amount < 0) errors.push(ERR_AMOUNT)
+      if (!date) errors.push(ERR_DATE_FORMAT)
+      if (!row.activityType) errors.push(ERR_ACTIVITY_TYPE)
+      if (!row.sourceName) errors.push(ERR_SOURCE_NAME)
+      if (!row.unit) errors.push(ERR_UNIT)
+      if (!Number.isFinite(amount) || amount < 0) errors.push(ERR_AMOUNT)
 
-    const factor = errors.length === 0 ? findFactor(row, factors) : null
-    if (!factor && errors.length === 0) errors.push(ERR_NO_FACTOR)
+      const factor = errors.length === 0 ? findFactor(row, factors) : null
+      if (!factor && errors.length === 0) errors.push(ERR_NO_FACTOR)
 
-    const key = buildExistingKey(row)
-    if (seenKeys.has(key)) warnings.push(WARN_BATCH_DUPLICATE)
-    if (existingKeys.has(key)) warnings.push(WARN_DB_EXISTS)
-    seenKeys.add(key)
+      const key = buildExistingKey(row)
+      if (seenKeys.has(key)) warnings.push(WARN_BATCH_DUPLICATE)
+      if (existingKeys.has(key)) warnings.push(WARN_DB_EXISTS)
+      seenKeys.add(key)
 
-    return {
-      ...row,
-      emissionFactorId: factor?.id ?? null,
-      factor: factor ? Number(factor.factor) : null,
-      co2e: factor && Number.isFinite(amount) ? round(amount * Number(factor.factor)) : null,
-      errors,
-      warnings,
-      status: getStatus(errors, warnings),
-    }
-  })
+      return {
+        ...row,
+        emissionFactorId: factor?.id ?? null,
+        factor: factor ? Number(factor.factor) : null,
+        co2e: factor && Number.isFinite(amount) ? round(amount * Number(factor.factor)) : null,
+        errors,
+        warnings,
+        status: getStatus(errors, warnings),
+      }
+    })
+  )
 }
 
 export async function ensureProduct(productCode = "", productName = "") {
@@ -405,14 +362,14 @@ export async function ensureProduct(productCode = "", productName = "") {
   })
 }
 
-export function getImportMappings() {
+export async function getImportMappings() {
   return MAPPINGS
 }
 
-export function getParsedAmount(row: ImportRow) {
+export async function getParsedAmount(row: ImportRow) {
   return toNumber(row.amount)
 }
 
-export function getParsedDate(row: ImportRow) {
+export async function getParsedDate(row: ImportRow) {
   return parseDate(row.date)
 }

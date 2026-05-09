@@ -1,4 +1,4 @@
-import type { ColumnMapping } from "@/lib/upload/types"
+import type { ColumnMapping } from "@/lib/upload"
 
 export const MAPPINGS: ColumnMapping[] = [
   { source: "일자(원본)", target: "date" },

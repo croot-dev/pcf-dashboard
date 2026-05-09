@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { ColumnMapping } from "@/lib/upload/types"
+import type { ColumnMapping } from "@/lib/upload"
 
 const TARGET_LABELS: Record<string, string> = {
   date: "일자",

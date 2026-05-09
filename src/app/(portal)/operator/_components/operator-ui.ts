@@ -1,4 +1,4 @@
-import type { ImportRow } from "@/lib/upload/types"
+import type { ImportRow } from "@/lib/upload"
 
 export function getStatusLabel(status: ImportRow["status"]) {
   if (status === "error") return "오류"
