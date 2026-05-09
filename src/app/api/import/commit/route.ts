@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 
-import { summarizeImportRows }  from "@/lib/upload"
+import { summarizeImportRows } from "@/lib/upload"
+import { ImportRowSchema } from "@/lib/upload/schemas"
 import {
   buildExistingActivityKeys,
   ensureProduct,
@@ -14,25 +15,6 @@ import {
 import type { ImportRow } from "@/lib/upload"
 
 export const dynamic = "force-dynamic"
-
-const ImportRowSchema = z.object({
-  id: z.string(),
-  rowNumber: z.number(),
-  date: z.string(),
-  activityType: z.string(),
-  sourceName: z.string(),
-  amount: z.string(),
-  unit: z.string(),
-  productCode: z.string(),
-  productName: z.string(),
-  emissionFactorId: z.string().nullable(),
-  factor: z.number().nullable(),
-  co2e: z.number().nullable(),
-  status: z.enum(["valid", "warning", "error"]),
-  errors: z.array(z.string()),
-  warnings: z.array(z.string()),
-  raw: z.record(z.string(), z.unknown()),
-})
 
 function monthStart(date: Date) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
@@ -84,6 +66,37 @@ async function findExistingActivity(row: ImportRow, productId: string, date: Dat
   })
 }
 
+/**
+ * @swagger
+ * /api/import/commit:
+ *   post:
+ *     tags:
+ *       - Import
+ *     summary: 검증된 활동 데이터 저장
+ *     description: >
+ *       검증이 완료된 import rows 중 error 상태가 아닌 행을 DB에 반영합니다.
+ *       제품과 월별 생산 배치를 생성하거나 재사용하고, 활동 데이터와 계산된 배출량을 함께 저장합니다.
+ *       동일한 제품·일자·활동유형·배출원·단위 조합은 기존 데이터를 갱신합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/ImportValidationRequest"
+ *     responses:
+ *       200:
+ *         description: 저장 결과
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ImportCommitResponse"
+ *       500:
+ *         description: 저장 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json()

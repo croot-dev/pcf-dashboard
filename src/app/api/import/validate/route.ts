@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { summarizeImportRows }  from "@/lib/upload"
+import { summarizeImportRows } from "@/lib/upload"
+import { ImportRowSchema } from "@/lib/upload/schemas"
 import {
   buildExistingActivityKeys,
   getActiveEmissionFactors,
@@ -12,25 +13,36 @@ import type { ColumnMapping, ImportRow } from "@/lib/upload"
 
 export const dynamic = "force-dynamic"
 
-const ImportRowSchema = z.object({
-  id: z.string(),
-  rowNumber: z.number(),
-  date: z.string(),
-  activityType: z.string(),
-  sourceName: z.string(),
-  amount: z.string(),
-  unit: z.string(),
-  productCode: z.string(),
-  productName: z.string(),
-  emissionFactorId: z.string().nullable(),
-  factor: z.number().nullable(),
-  co2e: z.number().nullable(),
-  status: z.enum(["valid", "warning", "error"]),
-  errors: z.array(z.string()),
-  warnings: z.array(z.string()),
-  raw: z.record(z.string(), z.unknown()),
-})
-
+/**
+ * @swagger
+ * /api/import/validate:
+ *   post:
+ *     tags:
+ *       - Import
+ *     summary: 편집된 Excel 행 재검증
+ *     description: >
+ *       미리보기 또는 사용자가 수정한 import rows를 다시 검증합니다.
+ *       배출계수 매칭, 중복 여부, 필수값, 날짜, 수량 오류를 반영한 최신 검증 결과를 반환합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/ImportValidationRequest"
+ *     responses:
+ *       200:
+ *         description: 재검증된 import rows
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ImportPreviewResponse"
+ *       400:
+ *         description: 요청 데이터 검증 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json()

@@ -77,9 +77,9 @@ function toDashboardEmissionRow(row: EmissionWithRelations): DashboardEmissionRo
  *         required: false
  *         schema:
  *           type: string
- *           enum: [q1, q2, q3, q4, year]
- *           default: year
- *         description: 조회 기간입니다. 분기(q1~q4) 또는 연간(year)을 지정합니다.
+ *           pattern: "^[0-9]{4}$"
+ *           example: "2025"
+ *         description: 조회 연도입니다. 4자리 연도 형식으로 전달합니다.
  *     responses:
  *       200:
  *         description: 경영자 대시보드 요약 데이터
