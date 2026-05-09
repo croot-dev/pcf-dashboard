@@ -2,19 +2,19 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import type { DashboardData, PeriodId } from "@/lib/mock-data"
-import { HeroKPI } from "@/components/dashboard/widgets/HeroKPI"
-import { SourceBreakdownDonut } from "@/components/dashboard/widgets/SourceBreakdownDonut"
-import { DataIntegrityCard } from "@/components/dashboard/widgets/DataIntegrityCard"
-import { StackedActivityChart } from "@/components/dashboard/widgets/StackedActivityChart"
-import { MoMVarianceChart } from "@/components/dashboard/widgets/MoMVarianceChart"
-import { ParetoChart } from "@/components/dashboard/widgets/ParetoChart"
-import { EmissionFactorsCard } from "@/components/dashboard/widgets/EmissionFactorsCard"
+import type { DashboardData } from "@/lib/dashboard/types"
+import { HeroKPI } from "./_components/HeroKPI"
+import { SourceBreakdownDonut } from "./_components/SourceBreakdownDonut"
+import { StackedActivityChart } from "./_components/StackedActivityChart"
+import { MoMVarianceChart } from "./_components/MoMVarianceChart"
 import { PageLayout } from "@/components/layout/PageLayout"
+import { StackedYoYChart } from "./_components/StackedYoYChart"
+import { PCFTable } from "./_components/PCFTable"
+import dayjs from "dayjs"
 
 function DashboardContent() {
   const searchParams = useSearchParams()
-  const period = (searchParams.get("period") ?? "q3") as PeriodId
+  const period = searchParams.get("period") ?? dayjs().format("YYYY")
   const [data, setData] = useState<DashboardData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,7 +26,7 @@ function DashboardContent() {
       setData(null)
 
       try {
-        const response = await fetch(`/api/dashboard/executive/summary?period=${period}`, {
+        const response = await fetch(`/api/executive/summary?period=${period}`, {
           signal: controller.signal,
         })
 
@@ -69,38 +69,39 @@ function DashboardContent() {
       }}
     >
       {/* Row 1: Hero KPI · Source Donut · Data Integrity */}
-      <div style={{ gridColumn: "span 4", display: "flex", flexDirection: "column" }}>
+      <div style={{ gridColumn: "span 3", display: "flex", flexDirection: "column" }}>
         <HeroKPI d={data} />
       </div>
+
+      {/* <div style={{ gridColumn: "span 3", display: "flex", flexDirection: "column" }}>
+        <ScopeBreakdownDonut scope={data.scope} />
+      </div> */}
+
+      <div style={{ gridColumn: "span 9", display: "flex", flexDirection: "column" }}>
+        <StackedActivityChart data={data.activity} />
+      </div>
+
       <div style={{ gridColumn: "span 4", display: "flex", flexDirection: "column" }}>
         <SourceBreakdownDonut sources={data.sources} />
       </div>
-      <div style={{ gridColumn: "span 4", display: "flex", flexDirection: "column" }}>
-        <DataIntegrityCard counts={data.recordCounts} total={data.recordCount} />
+      <div style={{ gridColumn: "span 8", display: "flex", flexDirection: "column" }}>
+        <PCFTable rows={data.pcfTable} />
       </div>
 
-      {/* Row 2: Stacked Activity Chart · MoM Variance */}
-      <div style={{ gridColumn: "span 8", display: "flex", flexDirection: "column" }}>
-        <StackedActivityChart data={data.activity} />
-      </div>
-      <div style={{ gridColumn: "span 4", display: "flex", flexDirection: "column" }}>
+      <div style={{ gridColumn: "span 6", display: "flex", flexDirection: "column" }}>
         <MoMVarianceChart monthly={data.monthly} />
       </div>
+      <div style={{ gridColumn: "span 6", display: "flex", flexDirection: "column" }}>
+        <StackedYoYChart data={data.yoyActivity} year={Number(period)} />
+      </div>
 
-      {/* Row 3: Pareto · Emission Factors */}
-      <div style={{ gridColumn: "span 7", display: "flex", flexDirection: "column" }}>
-        <ParetoChart sources={data.sources} />
-      </div>
-      <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column" }}>
-        <EmissionFactorsCard data={data.activity} factors={data.factors} />
-      </div>
     </div>
   )
 }
 
 export default function DashboardPage() {
   return (
-    <PageLayout title={{ ko: "경영자 View 대시보드", en: "Operator Dashboard" }}>
+    <PageLayout title={{ ko: "경영자 View 대시보드", en: "Executive Dashboard" }}>
       <Suspense fallback={<div style={{ padding: 32, color: "var(--fg-3)" }}>불러오는 중…</div>}>
         <DashboardContent />
       </Suspense>

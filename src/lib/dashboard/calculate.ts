@@ -9,7 +9,7 @@ import type {
   RecordCounts,
   SourceRow,
   YoYPoint,
-} from "@/lib/mock-data"
+} from "@/lib/dashboard/types"
 
 export type DashboardEmissionRow = {
   date: Date
@@ -135,7 +135,12 @@ export function buildActivityTrend(
   const end = dayjs.utc(window.trendEnd).startOf("month")
 
   while (cursor.isBefore(end) || cursor.isSame(end)) {
-    points.set(cursor.format("MM"), { m: cursor.format("MM") })
+    points.set(cursor.format("MM"), {
+      m: cursor.format("MM"),
+      "Scope 1": 0,
+      "Scope 2": 0,
+      "Scope 3": 0,
+    })
     cursor = cursor.add(1, "month")
   }
 
@@ -143,7 +148,8 @@ export function buildActivityTrend(
     const label = monthLabel(row.date)
     const point = points.get(label)
     if (!point) continue
-    point[row.activityType] = ((point[row.activityType] as number | undefined) ?? 0) + row.co2e
+    const scopeKey = `Scope ${row.scope}`
+    point[scopeKey] = ((point[scopeKey] as number | undefined) ?? 0) + row.co2e
   }
 
   return Array.from(points.values())

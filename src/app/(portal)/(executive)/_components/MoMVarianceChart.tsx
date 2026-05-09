@@ -14,7 +14,7 @@ import {
   type BarShapeProps,
 } from "recharts"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import type { MonthlyPoint } from "@/lib/mock-data"
+import type { MonthlyPoint } from "@/lib/dashboard/types"
 
 function buildMoM(monthly: MonthlyPoint[]) {
   return monthly.slice(1).map((cur, i) => {
@@ -58,8 +58,8 @@ export function MoMVarianceChart({ monthly }: Props) {
   return (
     <Card className="flex-1 gap-0 py-0">
       <CardHeader className="border-b px-5 py-3">
-        <CardTitle className="text-[13px] font-semibold">전월 대비 배출 변화</CardTitle>
-        <CardDescription className="text-[11px]">MoM Δ kgCO₂e</CardDescription>
+        <CardTitle className="text-[13px] font-semibold">전월 대비 증감 현황</CardTitle>
+        <CardDescription className="text-[11px]">지난달 대비 배출량의 순 증감량 (kgCO₂e)</CardDescription>
       </CardHeader>
       <CardContent className="p-5 pb-4">
         <ResponsiveContainer width="100%" height={220}>

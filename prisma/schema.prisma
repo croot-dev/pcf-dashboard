@@ -25,10 +25,8 @@ model EmissionFactor {
   activityType String    @db.VarChar(50)
   scope        String    @db.VarChar(20)
   sourceName   String    @db.VarChar(100)
-  region       String?   @db.VarChar(50)
   unit         String    @db.VarChar(20)
   factor       Decimal   @db.Decimal(10, 6)
-  methodology  String?   @db.VarChar(100)
   validFrom    DateTime  @db.Date
   validTo      DateTime? @db.Date
   createdAt    DateTime  @default(now()) @db.Timestamptz()

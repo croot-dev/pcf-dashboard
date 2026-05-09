@@ -1,16 +1,9 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Download } from "lucide-react"
 import { usePageTitle } from "./TitleContext"
-
-const PERIODS = [
-    { id: "year", ko: "연간", en: "Annual", range: "2025 ALL" },
-  { id: "q1",   ko: "1Q", en: "Q1",      range: "2025 Q1"  },
-  { id: "q2",   ko: "2Q", en: "Q2",      range: "2025 Q2"  },
-  { id: "q3",   ko: "3Q", en: "Q3",      range: "2025 Q3"  },
-  { id: "q4",   ko: "4Q", en: "Q4",      range: "2025 Q4"  },
-]
 
 export function TopBar() {
   const pathname = usePathname()
@@ -18,16 +11,31 @@ export function TopBar() {
   const searchParams = useSearchParams()
   const title = usePageTitle()
 
-  const isOperDashboard = pathname === "/"
-  const period = searchParams.get("period") ?? "year"
-  const currentPeriod = PERIODS.find((p) => p.id === period) ?? PERIODS[0]
+  const isExecDashboard = pathname === "/"
+  const period = searchParams.get("period") ?? ""
 
-  function setPeriod(id: string) {
+  const [years, setYears] = useState<number[]>([])
+
+  function setPeriod(value: string) {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("period", id)
+    params.set("period", value)
     router.push(`?${params.toString()}`)
   }
-  
+
+  useEffect(() => {
+    if (!isExecDashboard) return
+    fetch("/api/executive/years")
+      .then((r) => r.json())
+      .then(({ years: ys }: { years: number[] }) => {
+        setYears(ys)
+        if (ys.length > 0 && !/^\d{4}$/.test(period)) {
+          setPeriod(String(ys[0]))
+        }
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExecDashboard])
+
   return (
     <header
       style={{
@@ -69,66 +77,37 @@ export function TopBar() {
 
       <div style={{ flex: 1 }} />
 
-      {/* Period toggle — dashboard only */}
-      {isOperDashboard && (
-        <div
-          style={{
-            display: "inline-flex",
-            padding: 3,
-            borderRadius: "var(--radius-md)",
-            background: "var(--bg-muted)",
-            gap: 0,
-          }}
-        >
-          {PERIODS.map((p) => {
-            const active = p.id === period
-            return (
-              <button
-                key={p.id}
-                onClick={() => setPeriod(p.id)}
-                style={{
-                  height: 28,
-                  padding: "0 12px",
-                  border: "none",
-                  borderRadius: "var(--radius-sm)",
-                  background: active ? "var(--surface)" : "transparent",
-                  boxShadow: active ? "var(--shadow-sm)" : "none",
-                  color: active ? "var(--fg-1)" : "var(--fg-3)",
-                  fontWeight: active ? 600 : 500,
-                  fontSize: 12,
-                  cursor: "pointer",
-                  transition: "all .15s ease-out",
-                }}
-              >
-                {p.ko}
-              </button>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Range display */}
-      {isOperDashboard && (
-        <div
+      {/* Year selector — exec dashboard only */}
+      {isExecDashboard && years.length > 0 && (
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
           style={{
             height: 30,
-            padding: "0 10px",
+            padding: "0 28px 0 10px",
             borderRadius: "var(--radius-md)",
             border: "1px solid var(--border)",
             background: "var(--surface)",
-            display: "inline-flex",
-            alignItems: "center",
-            fontFamily: "var(--font-mono)",
             fontSize: 12,
+            fontFamily: "var(--font-mono)",
             color: "var(--fg-2)",
+            cursor: "pointer",
+            appearance: "none",
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 8px center",
           }}
         >
-          {currentPeriod.range}
-        </div>
+          {years.map((y) => (
+            <option key={y} value={String(y)}>
+              {y}년
+            </option>
+          ))}
+        </select>
       )}
 
       {/* Download */}
-      {isOperDashboard && (
+      {isExecDashboard && (
         <button
           style={{
             height: 30,
@@ -148,7 +127,6 @@ export function TopBar() {
           리포트
         </button>
       )}
-
     </header>
   )
 }

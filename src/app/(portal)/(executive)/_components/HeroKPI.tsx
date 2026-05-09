@@ -1,6 +1,6 @@
 import { TrendingDown, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import type { DashboardData } from "@/lib/mock-data"
+import type { DashboardData } from "@/lib/dashboard/types"
 
 interface Props {
   d: DashboardData
@@ -36,7 +36,7 @@ export function HeroKPI({ d }: Props) {
       />
       <CardContent className="flex flex-col pt-7 pb-5 px-7">
         <div style={{ fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--fg-3)" }}>
-          누적 배출량 · Total CO₂e
+          탄소 총 배출량
         </div>
         <div className="flex items-baseline gap-2 mt-2.5">
           <span
@@ -54,13 +54,13 @@ export function HeroKPI({ d }: Props) {
           <span style={{ fontSize: 15, color: "var(--fg-3)", marginBottom: 2 }}>t CO₂e</span>
         </div>
         <div style={{ marginTop: 4, fontSize: 11, color: "var(--fg-3)", fontFamily: "var(--font-mono)" }}>
-          {d.totalCO2.toLocaleString()} kg
+          {d.totalCO2.toLocaleString()} kgCO₂e
         </div>
         <div className="flex items-center gap-2 mt-3.5">
-          {d.deltaCO2 !== 0 ? (
+          {d.deltaCO2 ? (
             <>
               <Delta value={d.deltaCO2} />
-              <span style={{ fontSize: 12, color: "var(--fg-3)" }}>전기 대비</span>
+              <span style={{ fontSize: 12, color: "var(--fg-3)" }}>전년 대비</span>
             </>
           ) : (
             <span style={{ fontSize: 12, color: "var(--fg-3)" }}>전년 비교 데이터 없음</span>
